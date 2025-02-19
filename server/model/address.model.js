@@ -40,6 +40,9 @@ Address.init(
         city: {
             type: DataTypes.STRING,
         },
+        district: {
+            type: DataTypes.STRING,
+        },
         neighborhood: {
             type: DataTypes.STRING,
         },
