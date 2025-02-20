@@ -8,14 +8,6 @@ export default class UserService extends BaseService {
         this.addressRepository = addressRepository;
     };
 
-    async createUser(userData) {
-        const existingUser = await this.repository.findByEmail(userData.email);
-        if (!existingUser) throw new ConflictError("Email already registered!");
-
-        const hashedPassword = await bcrypt.hash(userData.password, 12);
-        return this.repository.create({ ...userData, password: hashedPassword });
-    };
-
     async getUserWithAddresses(userId) {
         return this.repository.findByIdWithAddresses(userId, {
             attributes: { exclude: ['password', 'emailVerifyOtp'] }

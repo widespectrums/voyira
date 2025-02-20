@@ -17,7 +17,7 @@ export const addressBaseSchema = {
 export const createAddressSchema = Joi.object({
     ...addressBaseSchema,
     userId: idSchema.required(),
-}).concat(timestampSchema);
+}); //.concat(timestampSchema);
 
 export const updateAddressSchema = Joi.object({
     ...addressBaseSchema,

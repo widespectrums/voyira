@@ -20,16 +20,16 @@ export const userBaseSchema = {
 
 export const createUserSchema = Joi.object({
     ...userBaseSchema,
+    username: Joi.string(),
     password: Joi.string()
         .pattern(passwordRegex)
         .required()
         .messages({
             "string.pattern.base": "The password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
         }),
-    role: Joi.string().valid('ROLE_USER', 'ROLE_ADMIN'),
     gender: Joi.string().valid('MAN', 'WOMAN', "OTHER"),
     dateOfBirth: Joi.date().max("now").iso()
-}). concat(idSchema).concat(timestampSchema);
+}); //concat(idSchema).concat(timestampSchema);
 
 export const updateUserSchema = Joi.object({
     ...userBaseSchema,

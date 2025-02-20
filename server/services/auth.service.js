@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import env from '../config/env.js'
-import {ForbiddenError, UnauthorizedError} from "../errors/api.error.js";
+import {ConflictError, ForbiddenError, UnauthorizedError} from "../errors/api.error.js";
 
 export default class AuthService {
     constructor(userRepository) {
@@ -22,6 +22,15 @@ export default class AuthService {
         }
         return this.generateTokens(user);
     };
+
+    async register(userData) {
+        const existingUser = await this.userRepository.findByEmail(userData.email);
+        if (existingUser) throw new ConflictError("Email already registered!");
+
+        const hashedPassword = await bcrypt.hash(userData.password, 12);
+        return this.userRepository.create({ ...userData, password: hashedPassword });
+    };
+
 
     generateTokens(user) {
         const accessToken = jwt.sign(
