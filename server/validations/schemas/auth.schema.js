@@ -30,3 +30,22 @@ export const resendEmailVerificationSchema = Joi.object({
         "string.email": "Please enter a valid email!",
     }),
 });
+
+export const sendForgetPasswordOtpSchema = Joi.object({
+    email: Joi.string().email().required().messages({
+        "string.email": "Please enter a valid email!",
+    }),
+});
+
+export const recoverPasswordSchema = Joi.object({
+    email: Joi.string().email().required().messages({
+        "string.email": "Please enter a valid email!",
+    }),
+    forgetPasswordOtp: Joi.string().min(6).max(6).required(),
+    password: Joi.string()
+        .pattern(passwordRegex)
+        .required()
+        .messages({
+            "string.pattern.base": "The password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+        }),
+})

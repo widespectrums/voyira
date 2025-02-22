@@ -63,10 +63,10 @@ User.init(
             type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
-        passwordResetOtp: {
+        forgetPasswordOtp: {
             type: DataTypes.STRING,
         },
-        passwordResetOtpExpiredAt: {
+        forgetPasswordOtpExpiredAt: {
             type: DataTypes.DATE,
         }
     }, {
