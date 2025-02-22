@@ -7,21 +7,21 @@ export default class UserRepository extends BaseRepository {
         super(User);
     };
 
-    async findByEmail(email, options = {}) {
+    findByEmail = async (email, options = {}) => {
         return this.model.findOne({
             where: { email },
             ...options,
         });
     };
 
-    async findByUsername(username, options = {}) {
+    findByUsername = async (username, options = {}) => {
         return this.model.findOne({
             where: { username },
             ...options,
         });
     };
 
-    async findByIdWithAddresses(id, options = {}) {
+    findByIdWithAddresses = async (id, options = {}) => {
         return this.model.findByPk(id, {
             ...options,
             include: [{
@@ -32,14 +32,14 @@ export default class UserRepository extends BaseRepository {
         });
     };
 
-    async updateEmailVerification(userId, isVerified, options = {}) {
+    updateEmailVerification = async (userId, isVerified, options = {}) => {
         return this.update(userId, {
             isEmailVerified: isVerified,
             emailVerifiedDate: isVerified ? new Date() : null
         }, options);
     };
 
-    async softDelete(userId, options = {}) {
+    softDelete = async (userId, options = {}) => {
         return this.delete(userId, options);
     };
 };

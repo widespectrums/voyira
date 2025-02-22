@@ -8,18 +8,18 @@ export default class UserService extends BaseService {
         this.addressRepository = addressRepository;
     };
 
-    async getUserWithAddresses(userId) {
+    getUserWithAddresses = async (userId) => {
         return this.repository.findByIdWithAddresses(userId, {
             attributes: { exclude: ['password', 'emailVerifyOtp'] }
         });
     };
 
-    async updateUserProfile(userId, updates) {
+    updateUserProfile = async (userId, updates) => {
         if (updates.password) { updates.password = await bcrypt.hash(updates.password, 12); }
         return this.repository.update(userId, updates);
     };
 
-    async deleteUser(userId) {
+    deleteUser =  async (userId) => {
         const transaction = await this.repository.model.sequelize.transaction();
         try {
             await this.addressRepository.deleteAllUserAddresses(userId, { transaction });

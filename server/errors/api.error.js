@@ -35,3 +35,9 @@ export class ForbiddenError extends ApiError {
         super(message, 403);
     };
 }
+
+export class TooManyRequestsError extends ApiError {
+    constructor(message = "Too Many Requests") {
+        super(message, 429);
+    };
+}

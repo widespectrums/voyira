@@ -10,20 +10,17 @@ export default class AuthService {
         this.refreshTokenSecret = env.jwt.refreshTokenSecret;
     };
 
-    async authenticate(email, password) {
+    authenticate = async (email, password) => {
         const user = await this.userRepository.findByEmail(email, {
             attributes: ['id', 'password', 'role', 'isEmailVerified', 'active']
         });
         if (!user || !(await bcrypt.compare(password, user.password))) {
             throw new UnauthorizedError("Invalid credentials!");
         }
-        if (!user.isEmailVerified) {
-            throw new ForbiddenError("Email not verified!");
-        }
         return this.generateTokens(user);
     };
 
-    async register(userData) {
+    register = async (userData) => {
         const existingUser = await this.userRepository.findByEmail(userData.email);
         if (existingUser) throw new ConflictError("Email already registered!");
 
@@ -51,7 +48,7 @@ export default class AuthService {
         }
     };
 
-    async refreshToken(refreshToken) {
+    refreshToken = async (refreshToken) => {
         try {
             const decoded = jwt.verify(refreshToken, this.refreshTokenSecret);
             const user = await this.userRepository.findById(decoded.userId);

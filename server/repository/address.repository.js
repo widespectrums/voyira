@@ -6,21 +6,21 @@ export default class AddressRepository extends BaseRepository {
         super(Address);
     };
 
-    async findAllByUser(userId, options = {}) {
+    findAllByUser = async (userId, options = {}) => {
         return this.model.findAll({
             where: { userId },
             ...options
         });
     };
 
-    async createForUser(userId, addressData, options = {}) {
+    createForUser = async (userId, addressData, options = {}) => {
         return this.create({
             ...addressData,
             userId
         }, options);
     };
 
-    async updateUserAddress(addressId, userId, updates, options = {}) {
+    updateUserAddress = async (addressId, userId, updates, options = {}) => {
         const address = await this.model.findOne({
             where: { id: addressId, userId },
             ...options
@@ -29,7 +29,7 @@ export default class AddressRepository extends BaseRepository {
         return address.update(updates, options);
     };
 
-    async deleteUserAddress(addressId, userId, options = {}) {
+    deleteUserAddress = async (addressId, userId, options = {}) => {
         const address = await this.model.findOne({
             where: { id: addressId, userId },
             ...options

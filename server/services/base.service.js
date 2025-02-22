@@ -5,21 +5,21 @@ export default class BaseService {
         this.repository = repository;
     };
 
-    async create(data, options = {}) {
+    create = async (data, options = {}) => {
         return this.repository.create(data, options);
     };
 
-    async getById(id, options = {}) {
+    getById = async (id, options = {}) => {
         const record = await this.repository.findById(id, options);
         if (!record) throw new NotFoundError(`${this.repository.model.name} not found!`);
         return record;
     };
 
-    async update(id, data, options = {}) {
+    update = async (id, data, options = {}) => {
         return this.repository.update(id, data, options);
     };
 
-    async delete(id, options = {}) {
+    delete = async (id, options = {}) => {
         return this.repository.delete(id, options);
     };
 };

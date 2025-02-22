@@ -1,21 +1,18 @@
 import express from 'express';
-import {authController} from "./controller/index.js";
-import sequelize from "./config/database.js";
 import env from "./config/env.js";
-import {
-    userValidation,
-    validateBody
-} from './validations/index.js';
+import sequelize from "./config/database.js";
+import authRoutes from "./routes/auth.routes.js";
+import apiLimiter from "./middlewares/ratelimit.middleware.js";
 
 const app = express()
 
 app.use(express.json());
+app.use(apiLimiter)
+app.use('/auth', authRoutes);
 
 app.get("/", (req, res) => {
     res.send("API Working successfully...");
 })
-app.post('/register', validateBody(userValidation.createUserSchema) ,authController.register);
-app.post('/login',  authController.login);
 
 sequelize.sync({alter: true})
     .then(() => {

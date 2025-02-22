@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import {idSchema, timestampSchema} from "./base.schema.js";
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -10,17 +9,17 @@ export const userBaseSchema = {
         "string.max": "Name should be maximum {#limit} letters!"
     }),
     lastName: Joi.string().min(2).max(50).required(),
+    username: Joi.string(),
     email: Joi.string().email().required().messages({
         "string.email": "Please enter a valid email!",
     }),
-    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).messages({
-        "string.pattern.base": "Please enter a valid phone number!",
-    })
 };
 
 export const createUserSchema = Joi.object({
     ...userBaseSchema,
-    username: Joi.string(),
+    phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).messages({
+        "string.pattern.base": "Please enter a valid phone number!",
+    }),
     password: Joi.string()
         .pattern(passwordRegex)
         .required()
@@ -29,7 +28,7 @@ export const createUserSchema = Joi.object({
         }),
     gender: Joi.string().valid('MAN', 'WOMAN', "OTHER"),
     dateOfBirth: Joi.date().max("now").iso()
-}); //concat(idSchema).concat(timestampSchema);
+});
 
 export const updateUserSchema = Joi.object({
     ...userBaseSchema,

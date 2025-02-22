@@ -6,7 +6,7 @@ export default class UserController extends BaseController {
         super(userService);
     };
 
-    async getProfile(req, res, next) {
+    getProfile = async (req, res, next) => {
         try {
             const user = await this.service.getUserWithAddresses(req.user.id);
             this.handleResponse(req, res, user);
@@ -15,7 +15,7 @@ export default class UserController extends BaseController {
         }
     };
 
-    async updateProfile(req, res, next) {
+    updateProfile = async (req, res, next) => {
         try {
             const updatedUser = await this.service.updateUserProfile(
                 req.user.id,
@@ -27,7 +27,7 @@ export default class UserController extends BaseController {
         }
     };
 
-    async deleteUser(req, res, next) {
+    deleteUser = async (req, res, next) => {
         try {
             await this.service.deleteUser(req.user.id);
             this.handleResponse(res, null, 204);
