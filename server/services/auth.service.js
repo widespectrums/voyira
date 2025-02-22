@@ -4,8 +4,9 @@ import env from '../config/env.js'
 import {ConflictError, ForbiddenError, UnauthorizedError} from "../errors/api.error.js";
 
 export default class AuthService {
-    constructor(userRepository) {
+    constructor(userRepository, emailService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
         this.tokenSecret = env.jwt.secret;
         this.refreshTokenSecret = env.jwt.refreshTokenSecret;
     };
@@ -20,14 +21,45 @@ export default class AuthService {
         return this.generateTokens(user);
     };
 
-    register = async (userData) => {
+    initializeRegistration = async (userData) => {
         const existingUser = await this.userRepository.findByEmail(userData.email);
         if (existingUser) throw new ConflictError("Email already registered!");
-
-        const hashedPassword = await bcrypt.hash(userData.password, 12);
-        return this.userRepository.create({ ...userData, password: hashedPassword });
+        const newUser = await this.userRepository.create({...userData});
+        const otp = this.generateOTP();
+        await this.userRepository.update(newUser.id, {
+            emailVerifyOtp: otp,
+            emailVerifyOtpExpiredAt: this.generateExpiryTime(1)
+        });
+        await this.emailService.sendVerificationEmail(newUser.email, otp);
+        return newUser;
     };
 
+    completeRegistration = async (userData) => {
+        const user = await this.userRepository.findByEmail(userData.email);
+        if (!user.emailVerifyOtp) {throw new ForbiddenError("No OTP found for this email!");}
+        if (!user.emailVerifyOtpExpiredAt > new Date()) {throw new ForbiddenError("OTP has expired!");}
+        if (user.emailVerifyOtp !== userData.emailVerifyOtp) {throw new ForbiddenError("Invalid OTP!");}
+        const hashedPassword = await bcrypt.hash(userData.password, 12);
+        await this.userRepository.updateEmailVerification(user.id, true);
+        await this.userRepository.update(user.id, {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            password: hashedPassword
+        });
+        return user;
+    };
+
+    resendVerificationEmail = async (userData) => {
+        const existingUser = await this.userRepository.findByEmail(userData.email);
+        const otp = this.generateOTP();
+        await this.userRepository.update(existingUser.id, {
+            emailVerifyOtp: otp,
+            emailVerifyOtpExpiredAt: this.generateExpiryTime(1)
+        });
+        await this.emailService.sendVerificationEmail(existingUser.email, otp);
+        return existingUser;
+    }
 
     generateTokens(user) {
         const accessToken = jwt.sign(
@@ -75,5 +107,13 @@ export default class AuthService {
     clearAuthCookies(res) {
         res.clearCookie('accessToken');
         res.clearCookie('refreshToken');
+    };
+
+    generateOTP() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    };
+
+    generateExpiryTime = (hours = 24) => {
+        return Date.now() + hours * 60 * 60 * 1000;
     };
 };

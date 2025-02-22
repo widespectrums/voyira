@@ -6,9 +6,29 @@ export default class AuthController extends BaseController {
         super(authService);
     }
 
-    register = async (req, res, next) => {
+    resendVerificationEmail = async (req, res, next) => {
         try {
-            const user = await this.service.register(req.body);
+            const user = await this.service.resendVerificationEmail(req.body);
+            console.log("Received Body:", req.body);
+            this.handleResponse(res, { id: user.id }, 201);
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
+
+    completeRegistration = async (req, res, next) => {
+        try {
+            const user = await this.service.completeRegistration(req.body);
+            console.log("Received Body:", req.body);
+            this.handleResponse(res, { id: user.id }, 201);
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
+
+    initializeRegistration = async (req, res, next) => {
+        try {
+            const user = await this.service.initializeRegistration(req.body);
             console.log("Received Body:", req.body);
             this.handleResponse(res, { id: user.id }, 201);
         } catch (error) {
@@ -42,16 +62,6 @@ export default class AuthController extends BaseController {
             const tokens = await authService.refreshToken(refreshToken);
             authService.setAuthCookies(res, tokens);
             this.handleResponse(res, { user: tokens.user });
-        } catch (error) {
-            this.handleError(next, error);
-        }
-    };
-
-    verifyEmail = async (req, res, next) => {
-        try {
-            const { otp } = req.body;
-            const user = await authService.verifyEmail(req.user.id, otp);
-            this.handleResponse(res, { verified: user.isEmailVerified });
         } catch (error) {
             this.handleError(next, error);
         }

@@ -8,6 +8,7 @@ const app = express()
 
 app.use(express.json());
 app.use(apiLimiter)
+
 app.use('/auth', authRoutes);
 
 app.get("/", (req, res) => {
