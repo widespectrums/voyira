@@ -3,7 +3,7 @@ import {Model} from "sequelize";
 export default class BaseRepository {
     constructor(model) {
         if (!(model.prototype instanceof Model)) {
-            throw new Error("Invalid repository model schema!");
+            throw new Error("Invalid repository models schema!");
         }
         this.model = model;
     };

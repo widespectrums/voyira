@@ -2,17 +2,18 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import env from '../config/env.js'
 import {ConflictError, NotFoundError, UnauthorizedError, ValidationError} from "../errors/api.error.js";
+import BaseService from "./base.service.js";
 
-export default class AuthService {
+export default class AuthService extends BaseService {
     constructor(userRepository, emailService) {
-        this.userRepository = userRepository;
+        super(userRepository);
         this.emailService = emailService;
         this.tokenSecret = env.jwt.secret;
         this.refreshTokenSecret = env.jwt.refreshTokenSecret;
     };
 
     authenticate = async (email, password) => {
-        const user = await this.userRepository.findByEmail(email, {
+        const user = await this.repository.findByEmail(email, {
             attributes: ['id', 'password', 'role', 'isEmailVerified', 'active']
         });
         if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -22,11 +23,11 @@ export default class AuthService {
     };
 
     initializeRegistration = async (userData) => {
-        const existingUser = await this.userRepository.findByEmail(userData.email);
+        const existingUser = await this.repository.findByEmail(userData.email);
         if (existingUser) throw new ConflictError("Email already registered!");
-        const newUser = await this.userRepository.create({...userData});
+        const newUser = await this.repository.create({...userData});
         const otp = this.generateOTP();
-        await this.userRepository.update(newUser.id, {
+        await this.repository.update(newUser.id, {
             emailVerifyOtp: otp,
             emailVerifyOtpExpiredAt: this.generateExpiryTime(1)
         });
@@ -35,14 +36,14 @@ export default class AuthService {
     };
 
     completeRegistration = async (userData) => {
-        const user = await this.userRepository.findByEmail(userData.email);
+        const user = await this.repository.findByEmail(userData.email);
         if (!user) throw new NotFoundError("User not found!");
         if (!user.emailVerifyOtp) {throw new ValidationError("No OTP found for this email!");}
         if (!user.emailVerifyOtpExpiredAt > new Date()) {throw new ValidationError("OTP has expired!");}
         if (user.emailVerifyOtp !== userData.emailVerifyOtp) {throw new ValidationError("Invalid OTP!");}
         const hashedPassword = await bcrypt.hash(userData.password, 12);
-        await this.userRepository.updateEmailVerification(user.id, true);
-        await this.userRepository.update(user.id, {
+        await this.repository.updateEmailVerification(user.id, true);
+        await this.repository.update(user.id, {
             firstName: userData.firstName,
             lastName: userData.lastName,
             email: userData.email,
@@ -52,10 +53,10 @@ export default class AuthService {
     };
 
     resendVerificationEmail = async (userData) => {
-        const existingUser = await this.userRepository.findByEmail(userData.email);
+        const existingUser = await this.repository.findByEmail(userData.email);
         if (!existingUser) throw new NotFoundError("User not found!");
         const otp = this.generateOTP();
-        await this.userRepository.update(existingUser.id, {
+        await this.repository.update(existingUser.id, {
             emailVerifyOtp: otp,
             emailVerifyOtpExpiredAt: this.generateExpiryTime(1)
         });
@@ -64,10 +65,10 @@ export default class AuthService {
     };
 
     sendForgetPasswordOtp = async (userData) => {
-        const existingUser = await this.userRepository.findByEmail(userData.email);
+        const existingUser = await this.repository.findByEmail(userData.email);
         if (!existingUser) throw new NotFoundError("User not found!");
         const otp = this.generateOTP();
-        await this.userRepository.update(existingUser.id, {
+        await this.repository.update(existingUser.id, {
             forgetPasswordOtp: otp,
             forgetPasswordOtpExpiredAt: this.generateExpiryTime(1)
         });
@@ -76,13 +77,13 @@ export default class AuthService {
     };
 
     recoverPassword = async (userData) => {
-        const user = await this.userRepository.findByEmail(userData.email);
+        const user = await this.repository.findByEmail(userData.email);
         if (!user) throw new NotFoundError("User not found!");
         if (!user.forgetPasswordOtp) {throw new ValidationError("No OTP found for this email!");}
         if (!user.forgetPasswordOtpExpiredAt > new Date()) {throw new ValidationError("OTP has expired!");}
         if (user.forgetPasswordOtp !== userData.forgetPasswordOtp) {throw new ValidationError("Invalid OTP!");}
         const hashedPassword = await bcrypt.hash(userData.password, 12);
-        await this.userRepository.update(user.id, {
+        await this.repository.update(user.id, {
             password: hashedPassword
         });
         return user;
@@ -110,7 +111,7 @@ export default class AuthService {
     refreshToken = async (refreshToken) => {
         try {
             const decoded = jwt.verify(refreshToken, this.refreshTokenSecret);
-            const user = await this.userRepository.findById(decoded.userId);
+            const user = await this.repository.findById(decoded.userId);
             if (!user) throw new NotFoundError("User not found!");
             return this.generateTokens(user);
         } catch (error) { throw new UnauthorizedError("Invalid refresh token!"); }

@@ -89,9 +89,10 @@ User.init(
 User.associate = models => {
     User.hasMany(models.Address, {
         foreignKey: 'userId',
-        as: 'user',
+        as: 'addresses',
         onDelete: 'CASCADE',
-    })
-}
+        constraints: true
+    });
+};
 
 export default User;

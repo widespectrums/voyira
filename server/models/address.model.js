@@ -65,7 +65,8 @@ Address.associate = models => {
         foreignKey: 'userId',
         as: 'user',
         onDelete: 'CASCADE',
-    })
-}
+        constraints: true
+    });
+};
 
 export default Address;
