@@ -29,4 +29,22 @@ export default class UserService extends BaseService {
         if (!updatedUser) throw new NotFoundError("User not found!");
         return this.getCurrentUserProfile(userId);
     };
+
+    deactivateUserAccount = async (userId) => {
+        const transaction = await this.repository.model.sequelize.transaction();
+        try {
+            const user = await this.repository.findById(userId, { transaction });
+            if (!user) throw new NotFoundError("User not found!");
+            const addresses = await this.addressRepository.findAllByUser(userId, { transaction });
+            for (const address of addresses) {await this.addressRepository.delete(address.id, { transaction });}
+            await this.repository.update(userId, { active: false }, { transaction });
+            await transaction.commit();
+            return await this.repository.findById(userId, {
+                attributes: { exclude: ['password', 'emailVerifyOtp', 'passwordResetOtp'] },
+            });
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+    };
 };

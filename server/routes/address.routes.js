@@ -9,6 +9,8 @@ router.use(apiLimiter);
 
 
 router.post("/", addressController.createUserAddress);
-
+router.get("/", addressController.getUserAddresses);
+router.patch("/:addressId", addressController.updateUserAddress);
+router.delete("/:addressId", addressController.deleteUserAddress);
 
 export default router;

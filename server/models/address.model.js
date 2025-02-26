@@ -57,6 +57,7 @@ Address.init(
         modelName: 'Address',
         tableName: 'addresses',
         timestamps: true,
+        paranoid: true,
     }
 );
 

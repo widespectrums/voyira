@@ -11,4 +11,5 @@ router.route("/me")
     .get(userController.getProfile)
     .patch(userController.updateProfile)
 
+router.post("/me/deactivate", userController.deactivateAccount);
 export default router;

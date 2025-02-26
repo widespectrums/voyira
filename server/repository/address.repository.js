@@ -6,18 +6,11 @@ export default class AddressRepository extends BaseRepository {
         super(Address);
     };
 
-    findAllByUser = async (userId, options = {}) => {
+    findAllAddressesByUser = async (userId, options = {}) => {
         return this.model.findAll({
             where: { userId },
             ...options
         });
-    };
-
-    createForUser = async (userId, addressData, options = {}) => {
-        return this.create({
-            ...addressData,
-            userId
-        }, options);
     };
 
     updateUserAddress = async (addressId, userId, updates, options = {}) => {

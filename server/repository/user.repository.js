@@ -28,7 +28,6 @@ export default class UserRepository extends BaseRepository {
         });
     };
 
-
     updateEmailVerification = async (userId, isVerified, options = {}) => {
         return this.update(userId, {
             isEmailVerified: isVerified,

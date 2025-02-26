@@ -1,4 +1,5 @@
 import BaseController from "./base.controller.js";
+import {NotFoundError} from "../errors/api.error.js";
 
 export default class UserController extends BaseController {
     constructor(service) {
@@ -21,6 +22,15 @@ export default class UserController extends BaseController {
                 req.body
             );
             this.handleResponse(res, updatedUser);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    deactivateAccount = async (req, res, next) => {
+        try {
+            const deactivatedUser = await this.service.deactivateUserAccount(req.auth.userId);
+            this.handleResponse(res, null, 204);
         } catch (error) {
             next(error);
         }
