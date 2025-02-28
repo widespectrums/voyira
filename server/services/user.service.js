@@ -37,8 +37,8 @@ export default class UserService extends BaseService {
         try {
             await user.update({ active: false }, { transaction });
             const addresses = await this.addressRepository.findAllAddressesByUser(userId, { transaction });
-            for (const address of addresses) { await address.destroy({ transaction, force: false });}
-            await user.destroy({ transaction, force: false });
+            for (const address of addresses) { await this.addressRepository.delete(address, { transaction, force: false });}
+            await this.repository.delete(user, { transaction, force: false });
             await transaction.commit();
             return user;
         } catch (error) {await transaction.rollback(); throw error;}

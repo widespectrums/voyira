@@ -19,7 +19,7 @@ export default class AddressService extends BaseService {
 
     updateUserAddress = async (addressId, userId, updates) => {
         return this.repository.updateUserAddress(addressId, userId, updates);
-    }
+    };
 
     deleteUserAddress = async (addressId, userId) => {
         const address = await this.repository.findById(addressId);

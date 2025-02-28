@@ -26,9 +26,14 @@ export default class BaseRepository {
         return instance.update(data, options);
     };
 
-    delete = async (id, options = {}) => {
-        const instance = await this.model.findByPk(id, options);
-        if (!instance) throw new Error(`${this.model.name} not found!`);
+    delete = async (identifier, options = {}) => {
+        let instance;
+        if(identifier instanceof this.model) {
+            instance = identifier;
+        } else {
+            instance = await this.model.findByPk(identifier, options);
+            if (!instance) throw new Error(`${this.model.name} not found!`);
+        }
         const useForce = options.force === true;
         return instance.destroy({ ...options, force: useForce });
     };
