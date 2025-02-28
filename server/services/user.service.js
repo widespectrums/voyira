@@ -31,20 +31,16 @@ export default class UserService extends BaseService {
     };
 
     deactivateUserAccount = async (userId) => {
+        const user = await this.repository.findById(userId);
+        if (!user) throw new NotFoundError("User not found!");
         const transaction = await this.repository.model.sequelize.transaction();
         try {
-            const user = await this.repository.findById(userId, { transaction });
-            if (!user) throw new NotFoundError("User not found!");
-            const addresses = await this.addressRepository.findAllByUser(userId, { transaction });
-            for (const address of addresses) {await this.addressRepository.delete(address.id, { transaction });}
-            await this.repository.update(userId, { active: false }, { transaction });
+            await user.update({ active: false }, { transaction });
+            const addresses = await this.addressRepository.findAllAddressesByUser(userId, { transaction });
+            for (const address of addresses) { await address.destroy({ transaction, force: false });}
+            await user.destroy({ transaction, force: false });
             await transaction.commit();
-            return await this.repository.findById(userId, {
-                attributes: { exclude: ['password', 'emailVerifyOtp', 'passwordResetOtp'] },
-            });
-        } catch (error) {
-            await transaction.rollback();
-            throw error;
-        }
+            return user;
+        } catch (error) {await transaction.rollback(); throw error;}
     };
 };

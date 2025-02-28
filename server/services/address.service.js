@@ -25,6 +25,6 @@ export default class AddressService extends BaseService {
         const address = await this.repository.findById(addressId);
         if (!address) throw new NotFoundError("Address not found!");
         if (address.userId !== userId) throw new ForbiddenError("Unauthorized to delete this address!");
-        return this.repository.delete(addressId);
+        return this.repository.delete(addressId, { force: false });
     };
 }

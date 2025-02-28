@@ -20,6 +20,6 @@ export default class BaseService {
     };
 
     delete = async (id, options = {}) => {
-        return this.repository.delete(id, options);
+        return this.repository.delete(id, { ...options, force: false });
     };
 };

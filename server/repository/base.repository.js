@@ -29,6 +29,7 @@ export default class BaseRepository {
     delete = async (id, options = {}) => {
         const instance = await this.model.findByPk(id, options);
         if (!instance) throw new Error(`${this.model.name} not found!`);
-        return instance.destroy(options);
+        const useForce = options.force === true;
+        return instance.destroy({ ...options, force: useForce });
     };
 };

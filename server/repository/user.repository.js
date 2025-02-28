@@ -34,8 +34,4 @@ export default class UserRepository extends BaseRepository {
             emailVerifiedDate: isVerified ? new Date() : null
         }, options);
     };
-
-    softDelete = async (userId, options = {}) => {
-        return this.delete(userId, options);
-    };
 };

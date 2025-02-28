@@ -28,6 +28,7 @@ export default class AddressRepository extends BaseRepository {
             ...options
         });
         if (!address) throw new Error("Address not found!");
-        return address.destroy(options);
+        const useForce = options.force === true;
+        return address.destroy({ ...options, force: useForce });
     };
 };
