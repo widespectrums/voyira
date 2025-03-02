@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import env from '../config/env.js'
+import env from '../config/env.js';
+import geoip from "geoip-lite";
 import {ConflictError, NotFoundError, UnauthorizedError, ValidationError} from "../errors/api.error.js";
 import BaseService from "./base.service.js";
+import {userBaseSchema as existingUser, userBaseSchema as newUser} from "../validations/schemas/user.schema.js";
 
 export default class AuthService extends BaseService {
     constructor(userRepository, emailService) {
@@ -12,13 +14,27 @@ export default class AuthService extends BaseService {
         this.refreshTokenSecret = env.jwt.refreshTokenSecret;
     };
 
-    authenticate = async (email, password) => {
+    authenticate = async (email, password, ipAddress) => {
         const user = await this.repository.findByEmail(email, {
             attributes: ['id', 'password', 'role', 'isEmailVerified', 'active']
         });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        const geoData = geoip.lookup(ipAddress);
+        if (!user) throw new UnauthorizedError("Invalid credentials!");
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            await this.repository.update(user.id, {
+                lastFailedLoginDate: new Date(),
+                lastFailedLoginIp: ipAddress,
+                lastFailedLoginLocation: geoData ? geoData.city || geoData.region : 'Unknown'
+            });
             throw new UnauthorizedError("Invalid credentials!");
         }
+        await this.repository.update(user.id, {
+            lastLoginDate: new Date(),
+            lastLoginIp: ipAddress,
+            lastLoginLocation: geoData ? geoData.city || geoData.region : 'Unknown'
+        })
+
         return this.generateTokens(user);
     };
 
@@ -89,6 +105,37 @@ export default class AuthService extends BaseService {
         return user;
     };
 
+    initializeEmailChange = async (userId, newEmail) => {
+        const existingUser = await this.repository.findByEmail(newEmail);
+        if (existingUser) throw new ConflictError('Email already in use');
+        const otp = this.generateOTP();
+        await this.repository.update(userId, {
+            pendingEmail: newEmail,
+            emailChangeOtp: otp,
+            emailChangeOtpExpiredAt: this.generateExpiryTime(1)
+        });
+        await this.emailService.sendChangePasswordEmail(newEmail, otp);
+    };
+
+    verifyEmailChange = async (userId, otp) => {
+        const user = await this.repository.findById(userId);
+        if (!user.pendingEmail || !user.emailChangeOtp) throw new ConflictError('No pending email change!');
+        if (!user.emailChangeOtpExpiredAt > new Date()) throw new ValidationError("OTP has expired!");
+        if (user.emailChangeOtp !== otp) throw new ValidationError("Invalid OTP!");
+        const transaction = await this.repository.model.sequelize.transaction();
+        try {
+            await this.repository.update(userId, {
+                email: user.pendingEmail,
+                pendingEmail: null,
+                emailChangeOtp: null,
+                emailChangeOtpExpiredAt: null
+            }, {transaction});
+            await this.emailService.sendEmailChangedNotification(user.email, user.pendingEmail);
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+        }
+    };
     generateTokens(user) {
         const accessToken = jwt.sign(
             { userId: user.id, role: user.role },

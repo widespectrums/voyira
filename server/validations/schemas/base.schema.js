@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
-export const idSchema = Joi.string().guid({
-    version: ["uuidv4"]
+export const idSchema = Joi.object({
+    addressId: Joi.string().guid({ version: ["uuidv4"] }).required()
 }).messages({
     "string.guid": "Invalid UUID format!",
     "any.required": "ID is required!"

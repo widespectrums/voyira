@@ -39,7 +39,8 @@ export default class AuthController extends BaseController {
     login = async (req, res, next) => {
         try {
             const { email, password } = req.body;
-            const tokens = await authService.authenticate(email, password);
+            const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            const tokens = await authService.authenticate(email, password, ipAddress);
             authService.setAuthCookies(res, tokens);
             this.handleResponse(res, { user: tokens.user }, 200);
         } catch (error) {
@@ -73,6 +74,30 @@ export default class AuthController extends BaseController {
             this.handleResponse(res, { id: user.id }, 201);
         } catch (error) {
             this.handleError(next, error);
+        }
+    };
+
+    initializeEmailChange = async (req, res, next) => {
+        try {
+            const result = await this.service.initializeEmailChange(
+                req.auth.userId,
+                req.body.newEmail
+            );
+            this.handleResponse(res, result);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    verifyEmailChange = async (req, res, next) => {
+        try {
+            const result = await this.service.verifyEmailChange(
+                req.auth.userId,
+                req.body.otp
+            );
+            this.handleResponse(res, result);
+        } catch (error) {
+            next(error);
         }
     };
 

@@ -46,10 +46,7 @@ Address.init(
         neighborhood: {
             type: DataTypes.STRING,
         },
-        street: {
-            type: DataTypes.STRING,
-        },
-        addressLine: {
+        fullAddress: {
             type: DataTypes.STRING,
         }
     }, {

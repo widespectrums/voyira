@@ -48,4 +48,12 @@ export const recoverPasswordSchema = Joi.object({
         .messages({
             "string.pattern.base": "The password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
         }),
-})
+});
+
+export const initiateEmailChangeSchema = Joi.object({
+    newEmail: Joi.string().email().required()
+});
+
+export const verifyEmailChangeSchema = Joi.object({
+    otp: Joi.string().length(6).pattern(/^[0-9]+$/).required()
+});

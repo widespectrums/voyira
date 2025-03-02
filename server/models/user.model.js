@@ -43,9 +43,6 @@ User.init(
             type: DataTypes.ENUM('ROLE_USER', 'ROLE_ADMIN'),
             defaultValue: 'ROLE_USER',
         },
-        last_login: {
-            type: DataTypes.DATE,
-        },
         emailVerifyOtp: {
             type: DataTypes.STRING,
         },
@@ -68,7 +65,33 @@ User.init(
         },
         forgetPasswordOtpExpiredAt: {
             type: DataTypes.DATE,
-        }
+        },
+        lastLoginDate: {
+            type: DataTypes.DATE,
+        },
+        lastLoginIp: {
+            type: DataTypes.STRING,
+        },
+        lastLoginLocation: {
+            type: DataTypes.STRING,
+        },
+        lastFailedLoginDate: {
+            type: DataTypes.DATE,
+        },
+        lastFailedLoginIp: {
+            type: DataTypes.STRING,
+        },
+        lastFailedLoginLocation: {
+            type: DataTypes.STRING,
+        },
+        pendingEmail: {
+            type: DataTypes.STRING,
+            validate: {
+                isEmail: true,
+            }
+        },
+        emailChangeOtp: DataTypes.STRING,
+        emailChangeOtpExpiredAt: DataTypes.DATE,
     }, {
         sequelize,
         modelName: 'User',

@@ -3,9 +3,11 @@ import {ConflictError, ForbiddenError, NotFoundError} from "../errors/api.error.
 import bcrypt from "bcryptjs";
 
 export default class UserService extends BaseService {
-    constructor(userRepository, addressRepository) {
+    constructor(userRepository, addressRepository, emailService, authService) {
         super(userRepository);
         this.addressRepository = addressRepository;
+        this.emailService = emailService;
+        this.authService = authService;
     };
 
     getCurrentUserProfile = async (userId) => {
