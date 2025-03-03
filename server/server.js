@@ -7,6 +7,7 @@ import apiLimiter from "./middlewares/ratelimit.middleware.js";
 import cookieParser from "cookie-parser";
 import addressRoutes from "./routes/address.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 const app = express()
 
@@ -18,6 +19,7 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes)
 app.use('/addresses', addressRoutes)
 app.use('/users', userRoutes)
+app.use('/products', productRoutes)
 
 app.get("/", (req, res) => {
     res.send("API Working successfully...");
