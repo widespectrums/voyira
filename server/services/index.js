@@ -7,6 +7,8 @@ import AddressService from "./address.service.js";
 import ProductService from "./product.service.js";
 import {ProductRepository} from "../repository/index.js";
 import {BrandRepository} from "../repository/index.js";
+import {CategoryRepository} from "../repository/index.js";
+import CategoryService from "./category.service.js";
 
 const userRepository = new UserRepository();
 const addressRepository = new AddressRepository();
@@ -15,10 +17,11 @@ const emailService = new EmailService();
 
 const productRepository = new ProductRepository();
 const brandRepository = new BrandRepository();
-
+const categoryRepository = new CategoryRepository();
 
 export const userService = new UserService(userRepository, addressRepository);
 export const authService = new AuthService(userRepository, emailService);
 export const addressService = new AddressService(addressRepository, userRepository)
 
 export const productService = new ProductService(productRepository, brandRepository);
+export const categoryService = new CategoryService(categoryRepository);
