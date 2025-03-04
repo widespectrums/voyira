@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');
+a.active hr {
+    display: block;
+}
+
+* {
+    font-family: Outfit, serif;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    a.active {
+        background-color: black;
+        color: white;
+    }
+}
+
+
