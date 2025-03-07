@@ -64,8 +64,7 @@ const AuthPage = () => {
                 email: formData.email,
                 password: formData.password
             });
-
-            localStorage.setItem('token', response.data.data.accessToken); // Token'ı kaydet
+            localStorage.setItem('token', response.data.data.accessToken); //COOKIEDE TUT!!!
             toast.success('Login Successful!');
             navigate('/'); // Ana sayfaya yönlendir
         } catch (error) {
@@ -76,15 +75,13 @@ const AuthPage = () => {
     const handlePasswordReset = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${backendUrl}/auth/recover-password`, {
+            const response = await axios.post(`${backendUrl}/auth/send-forget-password-otp`, {
                 email: formData.email,
-                forgetPasswordOtp: formData.otp,
-                password: formData.password
             });
-
             toast.success('Password reset successful!');
             setAuthMode('login'); // Giriş sayfasına yönlendir
             setOtpSent(false); // OTP durumunu sıfırla
+
         } catch (error) {
             toast.error(error.response?.data?.message || 'Password reset failed');
         }
