@@ -9,6 +9,10 @@ import addressRoutes from "./routes/address.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import brandRoutes from "./routes/brand.routes.js";
+import tagRoutes from "./routes/tag.routes.js";
+import colorRoutes from "./routes/color.routes.js";
+import sizeRoutes from "./routes/size.routes.js";
 
 const app = express()
 
@@ -22,6 +26,10 @@ app.use('/addresses', addressRoutes)
 app.use('/users', userRoutes)
 app.use('/products', productRoutes)
 app.use('/categories', categoryRoutes)
+app.use('/brands', brandRoutes)
+app.use('/tags', tagRoutes)
+app.use('/colors', colorRoutes)
+app.use('/sizes', sizeRoutes)
 
 app.get("/", (req, res) => {
     res.send("API Working successfully...");

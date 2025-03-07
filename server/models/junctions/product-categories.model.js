@@ -5,10 +5,18 @@ const ProductCategories = sequelize.define("ProductCategories", {
     product_id: {
         type: DataTypes.UUID,
         primaryKey: true,
+        references: {
+            model: 'products',
+            key: 'id'
+        }
     },
     category_id: {
         type: DataTypes.UUID,
         primaryKey: true,
+        references: {
+            model: 'categories',
+            key: 'id'
+        }
     }
 }, {
     sequelize,
