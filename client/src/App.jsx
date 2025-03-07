@@ -28,7 +28,7 @@ import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Login from "./pages/Login.jsx";
+import Login from "./pages/AuthPage.jsx";
 import Orders from "./pages/Orders.jsx";
 import Footer from "./components/Footer.jsx";
 
