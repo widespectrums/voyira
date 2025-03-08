@@ -1,5 +1,5 @@
-import BaseService from "./base.service.js";
-import {ConflictError, ForbiddenError, NotFoundError} from "../errors/api.error.js";
+import BaseService from "../base.service.js";
+import {ConflictError, ForbiddenError, NotFoundError} from "../../errors/api.error.js";
 import bcrypt from "bcryptjs";
 
 export default class UserService extends BaseService {

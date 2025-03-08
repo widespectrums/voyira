@@ -1,5 +1,5 @@
-import BaseService from "./base.service.js";
-import {ForbiddenError, NotFoundError} from "../errors/api.error.js";
+import BaseService from "../base.service.js";
+import {ForbiddenError, NotFoundError} from "../../errors/api.error.js";
 
 export default class AddressService extends BaseService {
     constructor(repository, userRepository) {

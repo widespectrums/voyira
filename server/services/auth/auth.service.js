@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import env from '../config/env.js';
+import env from '../../config/env.js';
 import geoip from "geoip-lite";
-import {ConflictError, NotFoundError, UnauthorizedError, ValidationError} from "../errors/api.error.js";
-import BaseService from "./base.service.js";
-import {userBaseSchema as existingUser, userBaseSchema as newUser} from "../validations/schemas/user.schema.js";
+import {ConflictError, NotFoundError, UnauthorizedError, ValidationError} from "../../errors/api.error.js";
+import BaseService from "../base.service.js";
+import {userBaseSchema as existingUser, userBaseSchema as newUser} from "../../validations/schemas/user.schema.js";
 
 export default class AuthService extends BaseService {
     constructor(userRepository, emailService) {

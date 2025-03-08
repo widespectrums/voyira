@@ -1,4 +1,5 @@
 import {Model} from "sequelize";
+import sequelize from "../config/database.js";
 
 export default class BaseRepository {
     constructor(model) {
@@ -36,5 +37,9 @@ export default class BaseRepository {
         }
         const useForce = options.force === true;
         return instance.destroy({ ...options, force: useForce });
+    };
+
+    startTransaction() {
+        return sequelize.transaction();
     };
 };

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import env from "../config/env.js";
+import env from "../../config/env.js";
 
 export default class EmailService {
     constructor() {

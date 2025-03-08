@@ -1,4 +1,4 @@
-import BaseService from "./base.service.js";
+import BaseService from "../base.service.js";
 
 export default class TagService extends BaseService {
     constructor(repository) {

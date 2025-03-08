@@ -1,5 +1,5 @@
-import BaseRepository from "./base.repository.js";
-import models from "../models/index.js";
+import BaseRepository from "../base.repository.js";
+import models from "../../models/index.js";
 const { User, Address } = models;
 
 
