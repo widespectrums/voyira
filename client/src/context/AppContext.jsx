@@ -6,14 +6,11 @@ import Cookies from 'js-cookie';
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-    // Get token from cookie instead of localStorage for better security
     const [token, setToken] = useState(Cookies.get('token') || null);
+    const [cart, setCart] = useState([]); // Ensure cart is initialized as an empty array
     const navigate = useNavigate();
-
-    // Backend URL - replace with your actual backend URL
     const backendUrl = 'http://localhost:3100';
 
-    // Update token when cookie changes
     useEffect(() => {
         const cookieToken = Cookies.get('token');
         if (cookieToken !== token) {
@@ -41,7 +38,6 @@ export const AppProvider = ({ children }) => {
             response => response,
             error => {
                 if (error.response && error.response.status === 401) {
-                    // Auto logout on 401 responses
                     logout();
                 }
                 return Promise.reject(error);
@@ -54,43 +50,41 @@ export const AppProvider = ({ children }) => {
         };
     }, []);
 
-    // Logout function
     const logout = async () => {
         try {
-            // Call backend logout endpoint if token exists
             if (token) {
                 await axios.post(`${backendUrl}/auth/logout`);
             }
         } catch (error) {
             console.error('Logout error', error);
         } finally {
-            // Clear token from cookies and state
             Cookies.remove('token');
             setToken(null);
+            setCart([]); // Clear cart on logout
             navigate('/signin');
         }
     };
 
-    // Check token validity on app start
     useEffect(() => {
         const validateToken = async () => {
             if (token) {
                 try {
                     await axios.get(`${backendUrl}/auth/validate-token`);
                 } catch (error) {
-                    // If token validation fails, logout
                     logout();
                 }
             }
         };
 
         validateToken();
-    }, []);
+    }, [token]);
 
     return (
         <AppContext.Provider value={{
             token,
             setToken,
+            cart,
+            setCart, // Provide a way to modify the cart
             navigate,
             backendUrl,
             logout,

@@ -214,12 +214,10 @@ const AuthPage = () => {
                 email: formData.email,
                 password: formData.password
             });
-
             // Store token in cookies (more secure than localStorage)
             // Handle different response structures
             const tokenValue = response.data.token || response.data.user?.id;
             Cookies.set('token', tokenValue, { expires: 7, secure: true });
-
             toast.success('Login Successful!');
             navigate('/');
         } catch (error) {
@@ -229,7 +227,6 @@ const AuthPage = () => {
             setIsLoading(false);
         }
     };
-
     const handlePasswordReset = async (e) => {
         e.preventDefault();
 
@@ -261,7 +258,6 @@ const AuthPage = () => {
             setIsLoading(false);
         }
     };
-
     const renderForm = () => {
         switch(authMode) {
             case 'signup':
