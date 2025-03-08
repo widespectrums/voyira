@@ -18,7 +18,7 @@ export default class ProductController extends BaseController {
     getProductDetails = async (req, res, next) => {
         try {
             const product = await this.service.getProductDetails(req.params.productId);
-            console.log("Received Body:", product);
+            console.log("Product details retrieved:", product.id);
             return this.handleResponse(res, {product});
         } catch (error) {
             this.handleError(next, error);
@@ -47,4 +47,24 @@ export default class ProductController extends BaseController {
             this.handleError(next, error);
         }
     };
-}
+
+    updateProduct = async (req, res, next) => {
+        try {
+            const productId = req.params.productId;
+            const updatedProduct = await this.service.updateProduct(productId, req.body);
+            return this.handleResponse(res, {product: updatedProduct});
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
+
+    deleteProduct = async (req, res, next) => {
+        try {
+            const productId = req.params.productId;
+            await this.service.deleteProduct(productId);
+            return this.handleResponse(res, null, 204);
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
+};

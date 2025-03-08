@@ -152,7 +152,7 @@ export default class AuthService extends BaseService {
         return {
             accessToken, refreshToken,
             user: { id: user.id, role: user.role }
-        }
+        };
     };
 
     refreshToken = async (refreshToken) => {
