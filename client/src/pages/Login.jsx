@@ -1,212 +1,329 @@
-import {  useEffect, useState } from 'react';
-import { useShop} from "../context/AppContext.jsx";
+import { useState } from 'react';
+import { useApp } from "../context/AppContext.jsx";
 import axios from "axios";
 import { toast } from "react-toastify";
-import {  useLocation } from 'react-router-dom';
 
-const Login = () => {
-    const { token, setToken, navigate, backendUrl } = useShop();
-    const location = useLocation();
-
-    const [currentState, setCurrentState] = useState(location.pathname === '/signup' ? 'Sign Up' : 'Login');
-    const [name, setName] = useState('');
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
+const AuthPage = () => {
+    const { navigate, backendUrl } = useApp();
+    const [authMode, setAuthMode] = useState('login');
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        otp: '',
+        firstName: '',
+        lastName: ''
+    });
+    const [otpSent, setOtpSent] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [confirmPassword, setConfirmPassword] = useState('');
 
-    useEffect(() => {
-        if(location.pathname === '/signup') {
-            setCurrentState('Sign Up');
-        } else {
-            setCurrentState('Login');
-        }
-    }, [location]);
-
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
     const togglePassword = () => {
         setShowPassword(!showPassword);
     };
+    const sendOtp = async (type = 'registration') => {
+        try {
+            const endpoint = type === 'registration'
+                ? '/auth/initialize-registration'
+                : '/auth/send-forget-password-otp';
 
-    const handleFormSwitch = (newState) => {
-        setCurrentState(newState);
-        navigate(newState === 'Sign Up' ? '/signup' : '/signin');
-    };
-
-    const onSubmitHandler = async(event) => {
-        event.preventDefault();
-        try{
-            if(currentState === 'Sign Up'){
-                if(password !== confirmPassword) {
-                    toast.error("Passwords don't match!");
-                    return;
-                }
-                const response = await axios.post(backendUrl + '/api/user/register', {name, email, password});
-                handleAuthResponse(response, "Sign Up");
-            } else {
-                const response = await axios.post(backendUrl + '/api/user/login', {email, password});
-                handleAuthResponse(response, "Login");
-            }
-        } catch (error){
-            toast.error(error.response?.data?.message || error.message);
+            const response = await axios.post(`${backendUrl}${endpoint}`, {
+                email: formData.email});
+            setOtpSent(true);
+            toast.success('Verification code sent to your email!');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to send OTP');
         }
     };
-
-    const handleAuthResponse = (response, action) => {
-        if(response.data.success){
-            setToken(response.data.token);
-            localStorage.setItem('token', response.data.token);
-            toast.success(`${action} Successful!`);
-            navigate('/');
-        } else {
-            toast.error(response.data.message);
+    const handleRegistration = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(`${backendUrl}/auth/complete-registration`, {
+                email: formData.email,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                password: formData.password,
+                emailVerifyOtp: formData.otp
+            });
+            toast.success('Registration completed successfully!');
+            setAuthMode('login'); // Giriş sayfasına yönlendir
+            setOtpSent(false); // OTP durumunu sıfırla
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Registration failed');
         }
     };
-
-    useEffect(() => {
-        if(token){
-            navigate('/');
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(`${backendUrl}/auth/login`, {
+                email: formData.email,
+                password: formData.password
+            });
+            localStorage.setItem('token', response.data.data.accessToken); //COOKIEDE TUT!!!
+            toast.success('Login Successful!');
+            navigate('/'); // Ana sayfaya yönlendir
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Login failed');
         }
-    }, [token]);
+    };
+    // Şifre sıfırlama işlemi burada sıkıntı var ilk önce maille code göndermek gerekiyor
+    const handlePasswordReset = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(`${backendUrl}/auth/send-forget-password-otp`, {
+                email: formData.email,
+            });
+            toast.success('Password reset successful!');
+            setAuthMode('login'); // Giriş sayfasına yönlendir
+            setOtpSent(false); // OTP durumunu sıfırla
 
-    return (
-        <div className="container-lg">
-            <div className="row justify-content-center authentication authentication-basic align-items-center h-100">
-                <div className="col-xxl-4 col-xl-5 col-lg-5 col-md-6 col-sm-8 col-12">
-                    <div className="card custom-card my-4 border z-3 position-relative">
-                        <div className="card-body p-0">
-                            <div className="p-5">
-                                <div className="d-flex align-items-center justify-content-center mb-3">
-                                    <span className="auth-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" id="password">
-                                            {/* SVG içeriği buraya */}
-                                        </svg>
-                                    </span>
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Password reset failed');
+        }
+    };
+    const renderForm = () => {
+        switch (authMode) {
+            case 'signup':
+                return (
+                    <form onSubmit={!otpSent ? (e) => { e.preventDefault(); sendOtp('registration'); } : handleRegistration}>
+                        {!otpSent ? (
+                            <>
+                                <div className="mb-3">
+                                    <label className="form-label">First Name</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="firstName"
+                                        value={formData.firstName}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
                                 </div>
-                                <p className="h4 fw-semibold mb-0 text-center">{currentState}</p>
-                                <p className="mb-3 text-muted fw-normal text-center">
-                                    {currentState === 'Login' ? 'Welcome back!' : 'Join us by creating a free account!'}
-                                </p>
-
-                                <form onSubmit={onSubmitHandler}>
-                                    <div className="row gy-3">
-                                        {currentState === 'Sign Up' && (
-                                            <div className="col-xl-12">
-                                                <label className="form-label text-default">Full Name</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control form-control-lg"
-                                                    value={name}
-                                                    onChange={(e) => setName(e.target.value)}
-                                                    placeholder="Enter Full Name"
-                                                    required
-                                                />
-                                            </div>
-                                        )}
-
-                                        <div className="col-xl-12">
-                                            <label className="form-label text-default">
-                                                {currentState === 'Login' ? 'Email' : 'Email Address'}
-                                            </label>
-                                            <input
-                                                type="email"
-                                                className="form-control form-control-lg"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                placeholder={currentState === 'Login' ? 'Enter Email' : 'example@example.com'}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="col-xl-12">
-                                            <label className="form-label text-default">Password</label>
-                                            <div className="position-relative">
-                                                <input
-                                                    type={showPassword ? 'text' : 'password'}
-                                                    className="form-control form-control-lg"
-                                                    value={password}
-                                                    onChange={(e) => setPassword(e.target.value)}
-                                                    placeholder="Password"
-                                                    required
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y"
-                                                    onClick={togglePassword}
-                                                >
-                                                    <i className={`ri-eye${showPassword ? '' : '-off'}-line`}></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {currentState === 'Sign Up' && (
-                                            <div className="col-xl-12">
-                                                <label className="form-label text-default">Confirm Password</label>
-                                                <input
-                                                    type="password"
-                                                    className="form-control form-control-lg"
-                                                    value={confirmPassword}
-                                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                                    placeholder="Confirm Password"
-                                                    required
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="d-flex justify-content-between align-items-center mt-3">
-                                        {currentState === 'Login' && (
-                                            <div className="form-check">
-                                                <input type="checkbox" className="form-check-input" id="rememberMe"/>
-                                                <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
-                                            </div>
-                                        )}
-                                        <a href="#!" className="text-primary fs-12">
-                                            Forgot Password?
-                                        </a>
-                                    </div>
-
-                                    <div className="d-grid mt-4">
+                                <div className="mb-3">
+                                    <label className="form-label">Last Name</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Email address</label>
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Password</label>
+                                    <div className="input-group">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            className="form-control"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
                                         <button
-                                            type="submit"
-                                            className="btn btn-primary btn-lg"
+                                            className="btn btn-outline-secondary"
+                                            type="button"
+                                            onClick={togglePassword}
                                         >
-                                            {currentState === 'Login' ? 'Sign In' : 'Create Account'}
+                                            {showPassword ? 'Hide' : 'Show'}
                                         </button>
                                     </div>
-
-                                    <div className="text-center mt-4">
-                                        <p className="text-muted mb-0">
-                                            {currentState === 'Login' ? (
-                                                <>Dont have an account?{' '}
-                                                    <button
-                                                        type="button"
-                                                        className="text-primary btn btn-link p-0"
-                                                        onClick={() => handleFormSwitch('Sign Up')}
-                                                    >
-                                                        Sign Up
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>Already have an account?{' '}
-                                                    <button
-                                                        type="button"
-                                                        className="text-primary btn btn-link p-0"
-                                                        onClick={() => handleFormSwitch('Login')}
-                                                    >
-                                                        Sign In
-                                                    </button>
-                                                </>
-                                            )}
-                                        </p>
+                                </div>
+                                <button type="submit" className="btn btn-primary w-100">Send Verification Code</button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="mb-3">
+                                    <label className="form-label">Verification Code</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="otp"
+                                        maxLength="6"
+                                        value={formData.otp}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary w-100">Complete Registration</button>
+                            </>
+                        )}
+                    </form>
+                );
+            case 'forgotPassword':
+                return (
+                    <form onSubmit={!otpSent ? (e) => { e.preventDefault(); sendOtp('forgotPassword'); } : handlePasswordReset}>
+                        {!otpSent ? (
+                            <>
+                                <div className="mb-3">
+                                    <label className="form-label">Email address</label>
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary w-100">Send Reset Code</button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="mb-3">
+                                    <label className="form-label">Reset Code</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="otp"
+                                        maxLength="6"
+                                        value={formData.otp}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">New Password</label>
+                                    <div className="input-group">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            className="form-control"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            type="button"
+                                            onClick={togglePassword}
+                                        >
+                                            {showPassword ? 'Hide' : 'Show'}
+                                        </button>
                                     </div>
-                                </form>
+                                </div>
+                                <button type="submit" className="btn btn-primary w-100">Reset Password</button>
+                            </>
+                        )}
+                    </form>
+                );
+            default: // login
+                return (
+                    <form onSubmit={handleLogin}>
+                        <div className="mb-3">
+                            <label className="form-label">Email address</label>
+                            <input
+                                type="email"
+                                className="form-control"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Password</label>
+                            <div className="input-group">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="form-control"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                                <button
+                                    className="btn btn-outline-secondary"
+                                    type="button"
+                                    onClick={togglePassword}
+                                >
+                                    {showPassword ? 'Hide' : 'Show'}
+                                </button>
                             </div>
                         </div>
-                    </div>
+                        <div className="d-flex justify-content-between mb-3">
+                            <div className="form-check">
+                                <input type="checkbox" className="form-check-input" id="rememberMe" />
+                                <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-link"
+                                onClick={() => {
+                                    setAuthMode('forgotPassword');
+                                    setOtpSent(false);
+                                }}
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
+                        <button type="submit" className="btn btn-primary w-100">Sign In</button>
+                    </form>
+                );
+        }
+    };
+
+    return (
+        <div className="container d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+            <div className="card" style={{ width: '400px' }}>
+                <div className="card-body">
+                    <h2 className="card-title text-center mb-4">
+                        {authMode === 'login' ? 'Sign In' :
+                            authMode === 'signup' ? 'Sign Up' :
+                                'Reset Password'}
+                    </h2>
+
+                    {renderForm()}
+
+                    {authMode === 'login' && (
+                        <div className="text-center mt-3">
+                            <p>Dont have an account?
+                                <button
+                                    className="btn btn-link"
+                                    onClick={() => {
+                                        setAuthMode('signup');
+                                        setOtpSent(false);
+                                    }}
+                                >
+                                    Sign Up
+                                </button>
+                            </p>
+                        </div>
+                    )}
+
+                    {(authMode === 'signup' && otpSent) && (
+                        <div className="text-center mt-3">
+                            <p>Didnt receive code?
+                                <button
+                                    className="btn btn-link"
+                                    onClick={() => sendOtp('registration')}
+                                >
+                                    Resend
+                                </button>
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default AuthPage;
