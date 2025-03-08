@@ -31,6 +31,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from "./pages/AuthPage.jsx";
 import Orders from "./pages/Orders.jsx";
 import Footer from "./components/Footer.jsx";
+import CartPage from "./pages/CartPage.jsx";
+import ProductPage from "./pages/ProductPage.jsx";
+import OrderPage from "./pages/OrderPage.jsx";
+import PaymentPage from "./pages/PaymentPage.jsx";
 
 
 const App = () => {
@@ -40,6 +44,10 @@ const App = () => {
             <Navbar/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
+                <Route path="/product/:id" element={<ProductPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/payment" element={<PaymentPage />} />
+                <Route path="/orders" element={<OrderPage />} />
                 <Route path="/about" element={<About/>}/>
                 <Route path="/contact" element={<Contact/>}/>
                 <Route path="/signin" element={<Login />} />
