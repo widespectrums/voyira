@@ -1,18 +1,18 @@
 import express from 'express';
 import env from "./config/env.js";
 import sequelize from "./config/database.js";
-import authRoutes from "./routes/auth.routes.js";
-import adminRoutes from "./routes/admin.routes.js";
+import authRoutes from "./routes/auth/auth.routes.js";
+import adminRoutes from "./routes/admin/admin.routes.js";
 import apiLimiter from "./middlewares/ratelimit.middleware.js";
 import cookieParser from "cookie-parser";
-import addressRoutes from "./routes/address.routes.js";
+import addressRoutes from "./routes/address/address.routes.js";
 import userRoutes from "./routes/user.routes.js";
-import productRoutes from "./routes/product.routes.js";
-import categoryRoutes from "./routes/category.routes.js";
-import brandRoutes from "./routes/brand.routes.js";
-import tagRoutes from "./routes/tag.routes.js";
-import colorRoutes from "./routes/color.routes.js";
-import sizeRoutes from "./routes/size.routes.js";
+import productRoutes from "./routes/product/product.routes.js";
+import categoryRoutes from "./routes/category/category.routes.js";
+import brandRoutes from "./routes/brand/brand.routes.js";
+import tagRoutes from "./routes/tag/tag.routes.js";
+import colorRoutes from "./routes/color/color.routes.js";
+import sizeRoutes from "./routes/size/size.routes.js";
 
 const app = express()
 

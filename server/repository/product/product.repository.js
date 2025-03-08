@@ -1,4 +1,4 @@
-import BaseRepository from "../base.repository.js";
+import BaseRepository from "../base/base.repository.js";
 import models from "../../models/index.js";
 const { Product } = models;
 
@@ -7,10 +7,12 @@ export default class ProductRepository extends BaseRepository {
         super(Product);
     };
 
-    findBySlug = (slug, options = {}) => {
-        return this.model.findOne({
+    findBySlug = async (slug, options = {}) => {
+        return await this.model.findOne({
             where: { slug },
-            ...options
+            attributes: ['id', 'name', 'slug', 'price', 'description', 'stock', 'active']
+
+
         });
     }
 

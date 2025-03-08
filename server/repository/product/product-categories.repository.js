@@ -1,5 +1,5 @@
 import models from "../../models/index.js";
-import BaseRepository from "../base.repository.js";
+import BaseRepository from "../base/base.repository.js";
 const { ProductCategories } = models;
 
 export default class ProductCategoriesRepository extends BaseRepository {

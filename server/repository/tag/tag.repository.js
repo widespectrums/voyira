@@ -1,4 +1,4 @@
-import BaseRepository from "../base.repository.js";
+import BaseRepository from "../base/base.repository.js";
 import models from "../../models/index.js"
 const { Tag } = models;
 
