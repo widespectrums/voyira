@@ -34,18 +34,17 @@ export default class ProductController extends BaseController {
                 data: result.products,
                 pagination: result.pagination,
             });
-
-
-            /*
-            // Başarılı yanıt döndür
-            return res.status(200).json({
-                success: true,
-                data: result.products,
-                pagination: result.pagination
-            });
-            */
         } catch (error) {
             this.handleError(next, error);
         }
-    }
+    };
+
+    getProductBySlug = async (req, res, next) => {
+        try {
+            const product = await this.service.getProductBySlug(req.params.slug);
+            return this.handleResponse(res, {product});
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
 }

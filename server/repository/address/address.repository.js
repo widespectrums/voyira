@@ -1,4 +1,4 @@
-import BaseRepository from "../base.repository.js";
+import BaseRepository from "../base/base.repository.js";
 import Address from "../../models/address.model.js";
 
 export default class AddressRepository extends BaseRepository {

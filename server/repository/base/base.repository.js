@@ -1,5 +1,5 @@
 import {Model} from "sequelize";
-import sequelize from "../config/database.js";
+import sequelize from "../../config/database.js";
 
 export default class BaseRepository {
     constructor(model) {
@@ -13,9 +13,24 @@ export default class BaseRepository {
         return this.model.create(data, options);
     };
 
-    findById = async (id, options = {}) => {
-        return this.model.findByPk(id, options);
-    };
+    async findById(id, options = {}) {
+        try {
+            const result = await this.model.findByPk(id, options);
+            return result;
+        } catch (error) {
+            console.error(`Error in findById for ${this.model.name}:`, error);
+            // Detaylı hata mesajını logla
+            if (error.original) {
+                console.error("SQL Error Details:", {
+                    code: error.original.code,
+                    detail: error.original.detail,
+                    message: error.original.message,
+                    query: error.sql
+                });
+            }
+            throw error;
+        }
+    }
 
     findAll = async (options = {}) => {
         return this.model.findAll(options);

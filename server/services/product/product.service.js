@@ -1,4 +1,4 @@
-import BaseService from "../base.service.js";
+import BaseService from "../base/base.service.js";
 import models from "../../models/index.js";
 import slugify from "slugify";
 
@@ -174,6 +174,12 @@ export default class ProductService extends BaseService {
         if (!product) throw new Error('Product not found');
         return product;
     }
+
+    getProductBySlug = async (slug) => {
+        const product = await this.repository.findBySlug(slug);
+        if (!product) throw new Error('Product not found');
+        return await this.getProductDetails(product.id);
+    };
 
     addCategoriesToProduct = async (productId, categories, categoryId, transaction) => {
         const categoryIds = this.combineIds(categories, categoryId);
