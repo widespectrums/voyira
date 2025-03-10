@@ -12,7 +12,7 @@ const ProductDetail = () => {
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
-        axios.get(`http://localhost:3100/products/${id}`)
+        axios.get(`http://localhost:3000/products/${id}`)
             .then(response => setProduct(response.data))
             .catch(error => console.error("Ürün detayları alınırken hata oluştu:", error));
     }, [id]);

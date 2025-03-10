@@ -5,6 +5,8 @@ import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import apiLimiter from "../../middlewares/ratelimit.middleware.js";
 import { validateParams } from "../../validations/index.js";
 import { baseValidation } from "../../validations/index.js";
+import {dirname} from "path";
+import fs from "fs";
 
 const router = express.Router();
 
@@ -56,6 +58,27 @@ router.delete(
     "/images/:imageId",
     authMiddleware(["ROLE_ADMIN"]),
     imageController.deleteImage
+);
+
+router.get(
+    "/file/:filename",
+    (req, res, next) => {
+        try {
+            const { filename } = req.params;
+            const filePath = path.join(dirname(__dirname), '../../uploads/products', filename);
+
+            if (fs.existsSync(filePath)) {
+                return res.sendFile(filePath);
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    message: "Image not found"
+                });
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
 );
 
 export default router;

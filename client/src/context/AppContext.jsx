@@ -9,7 +9,7 @@ export const AppProvider = ({ children }) => {
     const [token, setToken] = useState(Cookies.get('token') || null);
     const [cart, setCart] = useState([]); // Ensure cart is initialized as an empty array
     const navigate = useNavigate();
-    const backendUrl = 'http://localhost:3100';
+    const backendUrl = 'http://localhost:3000';
 
     useEffect(() => {
         const cookieToken = Cookies.get('token');
