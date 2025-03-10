@@ -3,6 +3,7 @@ import Image1 from '../assets/carousel-images/c-image-1.jpg';
 import Image2 from '../assets/carousel-images/c-image-2.jpg';
 import Image3 from '../assets/carousel-images/c-image-3.jpg';
 
+
 const Carousel = () => {
     return (
         <div id="carouselExampleDark" className="carousel carousel-dark slide" data-bs-ride="carousel">

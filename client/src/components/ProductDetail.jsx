@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useApp } from "../context/AppContext"; // Make sure the path is correct
+import { useApp } from "../context/AppContext.jsx"; // Make sure the path is correct
 
 const ProductDetail = () => {
     const { id } = useParams();

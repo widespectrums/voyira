@@ -1,14 +1,15 @@
 import Carousel from "../components/Carousel.jsx";
 import Marquee from "../components/Marquee.jsx";
-import ProductItem from "../components/ProductItem.jsx";
-
+import ProductList from "../components/ProductItem.jsx";
+import CustomNavbar from "../components/CustomNavbar.jsx";
 
 const Home = () => {
     return (
         <div>
-            <Carousel/>
+            <CustomNavbar />
+            <Carousel />
             <Marquee/>
-            <ProductItem/>
+            <ProductList/>
         </div>
     );
 };

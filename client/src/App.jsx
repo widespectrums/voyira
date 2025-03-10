@@ -23,7 +23,6 @@ import "./assets/libs/choices.js/public/assets/scripts/choices.min.js";
 import "./assets/js/main.js";
 
 import {Route, Routes} from "react-router-dom";
-import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
@@ -36,23 +35,20 @@ import ProductPage from "./pages/ProductPage.jsx";
 import OrderPage from "./pages/OrderPage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 
-
 const App = () => {
     return (
         <div>
             <ToastContainer/>
-            <Navbar/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
-                <Route path="/product/:id" element={<ProductPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/payment" element={<PaymentPage />} />
-                <Route path="/orders" element={<OrderPage />} />
                 <Route path="/about" element={<About/>}/>
                 <Route path="/contact" element={<Contact/>}/>
-                <Route path="/signin" element={<Login />} />
-                <Route path="/signup" element={<Login />} />
+                <Route path="/signup" element={<Login/>}/>
                 <Route path="/orders" element={<Orders/>}/>
+                <Route path="/cart" element={<CartPage/>}/>
+                <Route path="/product/:id" element={<ProductPage/>}/>
+                <Route path="/order/:id" element={<OrderPage/>}/>
+                <Route path="/payment" element={<PaymentPage/>}/>
             </Routes>
             <Footer/>
         </div>

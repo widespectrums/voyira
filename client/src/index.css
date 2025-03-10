@@ -1,11 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');*/
+/* Adobe Font Integration */
+@import url("https://use.typekit.net/your-project-id.css"); /* Replace with your Adobe Fonts project ID */
+
+
 a.active hr {
     display: block;
 }
 
-* {
-    font-family: Outfit, serif;
-}
+/** {*/
+/*    font-family: Outfit, serif;*/
+/*}*/
 
 ::-webkit-scrollbar {
     display: none;
@@ -19,3 +23,129 @@ a.active hr {
 }
 
 
+/* Navbar Styles */
+.carousel {
+    margin-top: -70px; /* Navbar'ın yüksekliğine göre ayarlayın */
+    position: relative;
+    z-index: 1;
+}
+
+/* Navbar Styles */
+.carousel {
+    margin-top: -70px; /* Ana sayfa için negatif margin */
+    position: relative;
+    z-index: 1;
+}
+
+/* Diğer sayfalar için navbar stili */
+.custom-navbar.other-page {
+    background-color: white;
+    color: black;
+}
+
+/* Ana sayfa olmayan içerik için padding/margin ayarı */
+.other-page-content {
+    padding-top: 100px; /* Navbar'ın altına içeriği konumlandırmak için */
+}
+.custom-navbar {
+    font-family: 'neue-haas-grotesk-display', sans-serif;
+    position: fixed;
+    width: 100%;
+    color: black;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    padding: 20px 0;
+}
+
+.custom-navbar.scrolled {
+    background-color: black;
+}
+
+.custom-navbar.hovered {
+    background-color: white;
+}
+
+.brand-text {
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 1.5rem;
+}
+
+/* Navigation Items */
+.custom-dropdown {
+    position: static;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+.nav-link {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+}
+
+/* Dropdown Content */
+.dropdown-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-top: 0;
+    background-color: white;
+    padding: 20px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;
+}
+
+.dropdown-item {
+    color: black;
+    padding: 10px 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: block;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    text-decoration: none;
+}
+
+/* Icon Styles */
+.icon-btn {
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Search Panel */
+.search-panel {
+    background-color: black;
+    color: white;
+}
+
+.search-input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid white;
+    border-radius: 0;
+    color: white;
+}
+
+.search-input:focus {
+    box-shadow: none;
+    background-color: transparent;
+    color: white;
+}
