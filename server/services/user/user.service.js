@@ -1,4 +1,4 @@
-import BaseService from "../base.service.js";
+import BaseService from "../base/base.service.js";
 import {ConflictError, ForbiddenError, NotFoundError} from "../../errors/api.error.js";
 import bcrypt from "bcryptjs";
 

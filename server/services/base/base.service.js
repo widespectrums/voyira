@@ -1,4 +1,4 @@
-import {NotFoundError} from "../errors/api.error.js";
+import {NotFoundError} from "../../errors/api.error.js";
 
 export default class BaseService {
     constructor(repository) {

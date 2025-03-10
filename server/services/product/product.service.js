@@ -1,4 +1,4 @@
-import BaseService from "../base.service.js";
+import BaseService from "../base/base.service.js";
 import models from "../../models/index.js";
 import slugify from "slugify";
 
@@ -10,12 +10,11 @@ export default class ProductService extends BaseService {
         productTagsRepository,
         productColorsRepository,
         productSizesRepository,
-
         categoryRepository,
         tagRepository,
         colorRepository,
         sizeRepository,
-        imagesRepository,
+        imageRepository
     ) {
         super(repository);
         this.brandRepository = brandRepository;
@@ -28,7 +27,7 @@ export default class ProductService extends BaseService {
         this.tagRepository = tagRepository;
         this.colorRepository = colorRepository;
         this.sizeRepository = sizeRepository;
-
+        this.imageRepository = imageRepository;
     };
 
     createProduct = async (productData) => {
@@ -87,10 +86,10 @@ export default class ProductService extends BaseService {
                 color_id,
                 size_id,
                 active,
-                include_relations = true // İlişkileri dahil etmek isteyip istemediğimizi belirten parametre
+                include_relations = true // Parameter to determine if we should include relations
             } = queryParams;
 
-            // Filtreleme seçenekleri
+            // Filtering options
             const filters = {
                 name,
                 minPrice: min_price,
@@ -99,7 +98,7 @@ export default class ProductService extends BaseService {
                 active: active === 'true' ? true : active === 'false' ? false : undefined
             };
 
-            // İlişkilerin dahil edilmesi
+            // Include relations
             const includeOptions = [];
 
             if (include_relations) {
@@ -108,20 +107,25 @@ export default class ProductService extends BaseService {
                     { model: models.Category, as: 'categories' },
                     { model: models.Tag, as: 'tags' },
                     { model: models.Color, as: 'colors' },
-                    { model: models.Size, as: 'sizes' }
+                    { model: models.Size, as: 'sizes' },
+                    {
+                        model: models.Image,
+                        as: 'images',
+                        where: { is_primary: true },
+                        required: false
+                    }
                 );
             }
 
-            // Eğer kategori filtresi varsa
+            // Add category filter if specified
             if (category_id) {
-                // İlişkisel filtreleme için özel koşullar ekleyebiliriz
                 const categoryIncludeOption = includeOptions.find(opt => opt.as === 'categories');
                 if (categoryIncludeOption) {
                     categoryIncludeOption.where = { id: category_id };
                 }
             }
 
-            // Benzer şekilde diğer ilişkisel filtreler için
+            // Similar for other relational filters
             if (tag_id) {
                 const tagIncludeOption = includeOptions.find(opt => opt.as === 'tags');
                 if (tagIncludeOption) {
@@ -143,7 +147,7 @@ export default class ProductService extends BaseService {
                 }
             }
 
-            // Repository'e sorgu parametrelerini gönder
+            // Send query parameters to the repository
             const result = await this.repository.getAllProducts({
                 page: parseInt(page) || 1,
                 limit: parseInt(limit) || 10,
@@ -168,12 +172,149 @@ export default class ProductService extends BaseService {
                 { model: this.tagRepository.model, as: 'tags' },
                 { model: this.colorRepository.model, as: 'colors' },
                 { model: this.sizeRepository.model, as: 'sizes' },
+                { model: models.Image, as: 'images', order: [['is_primary', 'DESC'], ['order', 'ASC']] }
             ]
         });
 
         if (!product) throw new Error('Product not found');
         return product;
     }
+
+    getProductBySlug = async (slug) => {
+        const product = await this.repository.findBySlug(slug);
+        if (!product) throw new Error('Product not found');
+        return await this.getProductDetails(product.id);
+    };
+
+    updateProduct = async (productId, updateData) => {
+        let transaction = null;
+        try {
+            // Validate brand if provided
+            if (updateData.brand_id) {
+                await this.validateBrand(updateData.brand_id);
+            }
+
+            // Extract relation IDs from the update data
+            const {
+                sizes, size_id,
+                colors, color_id,
+                tags, tag_id,
+                categories, category_id,
+                ...productDetails
+            } = updateData;
+
+            // If name is updated, generate a new slug
+            if (productDetails.name) {
+                productDetails.slug = await this.generateUniqueSlug(productDetails.name, productId);
+            }
+
+            transaction = await this.repository.startTransaction();
+
+            // Update the product details
+            await this.repository.update(productId, productDetails, { transaction });
+
+            // Update relations if provided
+            const updatePromises = [];
+
+            if (categories || category_id) {
+                updatePromises.push(
+                    this.productCategoriesRepository.updateProductCategories(
+                        productId,
+                        this.combineIds(categories, category_id),
+                        transaction
+                    )
+                );
+            }
+
+            if (tags || tag_id) {
+                updatePromises.push(
+                    this.productTagsRepository.updateProductTags(
+                        productId,
+                        this.combineIds(tags, tag_id),
+                        transaction
+                    )
+                );
+            }
+
+            if (colors || color_id) {
+                updatePromises.push(
+                    this.productColorsRepository.updateProductColors(
+                        productId,
+                        this.combineIds(colors, color_id),
+                        transaction
+                    )
+                );
+            }
+
+            if (sizes || size_id) {
+                updatePromises.push(
+                    this.productSizesRepository.updateProductSizes(
+                        productId,
+                        this.combineIds(sizes, size_id),
+                        transaction
+                    )
+                );
+            }
+
+            // Wait for all relation updates to complete
+            if (updatePromises.length > 0) {
+                await Promise.all(updatePromises);
+            }
+
+            await transaction.commit();
+            transaction = null;
+
+            // Return the updated product with all its relations
+            return await this.getProductDetails(productId);
+        } catch (error) {
+            if (transaction) {
+                await transaction.rollback()
+                    .catch(rollbackError => {
+                        console.error("Error during transaction rollback:", rollbackError.message);
+                    });
+            }
+            console.error("Error in updateProduct:", error);
+            throw error;
+        }
+    };
+
+    deleteProduct = async (productId) => {
+        let transaction = null;
+        try {
+            // First check if the product exists
+            const product = await this.repository.findById(productId);
+            if (!product) throw new Error('Product not found');
+
+            transaction = await this.repository.startTransaction();
+
+            // Delete all related records
+            await Promise.all([
+                this.productCategoriesRepository.removeRelationsFromProduct(productId, transaction),
+                this.productTagsRepository.removeRelationsFromProduct(productId, transaction),
+                this.productColorsRepository.removeRelationsFromProduct(productId, transaction),
+                this.productSizesRepository.removeRelationsFromProduct(productId, transaction),
+                // Remove product images from filesystem and database
+                this.imageRepository.deleteByProductId(productId, transaction)
+            ]);
+
+            // Now delete the product itself
+            await this.repository.delete(productId, { transaction, force: false });
+
+            await transaction.commit();
+            transaction = null;
+
+            return true;
+        } catch (error) {
+            if (transaction) {
+                await transaction.rollback()
+                    .catch(rollbackError => {
+                        console.error("Error during transaction rollback:", rollbackError.message);
+                    });
+            }
+            console.error("Error in deleteProduct:", error);
+            throw error;
+        }
+    };
 
     addCategoriesToProduct = async (productId, categories, categoryId, transaction) => {
         const categoryIds = this.combineIds(categories, categoryId);

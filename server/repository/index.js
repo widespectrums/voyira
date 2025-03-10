@@ -6,6 +6,7 @@ import CategoryRepository from './category/category.repository.js';
 import TagRepository from './tag/tag.repository.js';
 import ColorRepository from './color/color.repository.js';
 import SizeRepository from './size/size.repository.js';
+import ImageRepository from './image/image.repository.js';
 import ProductCategoriesRepository from "./product/product-categories.repository.js";
 import ProductSizesRepository from "./product/product-sizes.repository.js";
 import ProductColorsRepository from "./product/product-colors.repository.js";
@@ -24,7 +25,7 @@ const productTagsRepository = new ProductTagsRepository(tagRepository);
 export {
     UserRepository, AddressRepository, ProductRepository,
     BrandRepository, CategoryRepository, TagRepository,
-    ColorRepository, SizeRepository,
+    ColorRepository, SizeRepository, ImageRepository,
     productCategoriesRepository, productSizesRepository,
     productTagsRepository, productColorsRepository
 };

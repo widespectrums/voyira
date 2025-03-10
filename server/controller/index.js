@@ -1,6 +1,7 @@
 import AuthController from './auth.controller.js';
-import UserController from './user.controller.js'
+import UserController from './user.controller.js';
 import AddressController from "./address.controller.js";
+import ImageController from "./image.controller.js";
 import {
     addressService,
     userService,
@@ -10,7 +11,7 @@ import {
     tagService,
     colorService,
     sizeService,
-
+    imageService
 } from "../services/index.js";
 import ProductController from "./product.controller.js";
 import CategoryController from "./category.controller.js";
@@ -29,3 +30,4 @@ export const brandController = new BrandController(brandService);
 export const tagController = new TagController(tagService);
 export const colorController = new ColorController(colorService);
 export const sizeController = new SizeController(sizeService);
+export const imageController = new ImageController(imageService, productService);

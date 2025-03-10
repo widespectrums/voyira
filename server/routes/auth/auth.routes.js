@@ -1,10 +1,10 @@
 import express from 'express';
-import { authController } from "../controller/index.js";
-import { validateBody, authValidation } from '../validations/index.js';
-import {authRateLimiter} from "../middlewares/ratelimit.middleware.js";
-import * as userValidation from "../validations/schemas/user.schema.js";
-import {authMiddleware} from "../middlewares/auth.middleware.js";
-export * as authValidation from "../validations/schemas/auth.schema.js";
+import { authController } from "../../controller/index.js";
+import { validateBody, authValidation } from '../../validations/index.js';
+import {authRateLimiter} from "../../middlewares/ratelimit.middleware.js";
+import * as userValidation from "../../validations/schemas/user.schema.js";
+import {authMiddleware} from "../../middlewares/auth.middleware.js";
+export * as authValidation from "../../validations/schemas/auth.schema.js";
 
 const router = express.Router();
 
