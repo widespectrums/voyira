@@ -1,6 +1,6 @@
 import Carousel from "../components/Carousel.jsx";
 import Marquee from "../components/Marquee.jsx";
-import ProductDetail from "../components/ProductItem.jsx";
+import ProductDetail from "../components/ProductList.jsx";
 
 const Home = () => {
     return (

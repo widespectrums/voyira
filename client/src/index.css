@@ -166,3 +166,207 @@ a.active hr {
     color: white;
 }
 
+/* ProductDetail.css */
+
+.product-detail-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Image Gallery */
+.img-container {
+    position: relative;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: white;
+    color: #333;
+    padding: 5px 10px;
+    font-weight: 500;
+    z-index: 10;
+}
+
+.product-images img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Product Info */
+.product-info {
+    background-color: #fff;
+}
+
+.breadcrumbs {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.product-title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.product-subtitle {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.stars {
+    color: #ffc107;
+    letter-spacing: -2px;
+}
+
+.review-count {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.regular-price {
+    color: #6c757d;
+    font-size: 18px;
+}
+
+.sale-price {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* Color Swatches */
+.option-label {
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.color-options {
+    display: flex;
+    gap: 10px;
+}
+
+.color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.color-swatch.selected {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
+/* Size Buttons */
+.size-guide-link {
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.size-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.size-btn {
+    min-width: 50px;
+    padding: 8px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.size-btn.selected {
+    background-color: #333;
+    color: white;
+    border-color: #333;
+}
+
+/* Add to Bag Button */
+.add-to-bag-btn {
+    background-color: #333;
+    border: none;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.add-to-bag-btn:hover {
+    background-color: #222;
+}
+
+/* Additional Info Sections */
+.info-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-icon {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.description-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Model and Fit Info */
+.model-info, .fit-info {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.fit-links a {
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Sustainability Badges */
+.sustainability-info {
+    padding-top: 15px;
+    font-size: 14px;
+}
+
+.sustainability-badges {
+    display: flex;
+    margin-top: 15px;
+}
+
+.badge-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.badge-text {
+    font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-info {
+        padding: 20px 15px;
+    }
+
+    .color-options, .size-options {
+        justify-content: center;
+    }
+}

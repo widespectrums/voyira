@@ -28,8 +28,13 @@ const ProductList = () => {
         return imageUrl.startsWith("http") ? imageUrl : `${backendUrl}${imageUrl}`;
     };
 
-    const handleProductClick = (productId) => {
-        navigate(`/product/${productId}`);
+
+    const handleProductClick = (product) => {
+        if (product.slug) {
+            navigate(`/products/slug/${product.slug}`);
+        } else {
+            navigate(`/products/${product.id}`);
+        }
     };
 
     const handleAddToCart = (event, product) => {
@@ -55,7 +60,7 @@ const ProductList = () => {
                     {products.length > 0 ? (
                         products.slice(0, 4).map((product) => (
                             <div key={product.id} className="col-12 col-sm-6 col-lg-3 mb-4">
-                                <div className="card border-0 h-100" onClick={() => handleProductClick(product.id)} style={{ cursor: "pointer" }}>
+                                <div className="card border-0 h-100" onClick={() => handleProductClick(product)} style={{ cursor: "pointer" }}>
                                     <div style={{ position: "relative" }}>
                                         {product.images?.length > 0 ? (
                                             <div id={`carousel-${product.id}`} className="carousel slide" data-bs-ride="carousel">
