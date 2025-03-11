@@ -40,15 +40,15 @@ const CustomNavbar = () => {
 
     const toggleSearchPanel = () => setSearchOpen(!searchOpen);
 
-    // Ana sayfa için navbar stilini değiştir (şeffaf), diğer sayfalar için başka stil (siyah)
+    // Ana sayfa için navbar stilini değiştir (şeffaf), diğer sayfalar için beyaz arkaplan
     const navbarStyle = isHomePage
         ? `custom-navbar ${isScrolled ? 'scrolled' : ''} ${isNavbarHovered ? 'hovered' : ''}`
-        : 'custom-navbar other-page';
+        : 'custom-navbar white-bg';
 
-    // Ana sayfa için text rengini değiştir, diğer sayfalar için sabit beyaz
+    // Ana sayfa için text rengini değiştir, diğer sayfalar için sabit siyah
     const textStyle = isHomePage
         ? `${isNavbarHovered ? 'text-dark' : 'text-white'}`
-        : 'text-white';
+        : 'text-dark';
 
     return (
         <>
@@ -75,7 +75,7 @@ const CustomNavbar = () => {
                             {categories.map((category) => (
                                 <div
                                     key={category.id}
-                                    className="custom-dropdown"
+                                    className="custom-dropdown position-static"
                                     onMouseEnter={() => {
                                         setHoveredCategory(category.id);
                                         isHomePage && setIsNavbarHovered(true);
@@ -94,11 +94,11 @@ const CustomNavbar = () => {
                                     </div>
 
                                     {category.subCategories && category.subCategories.length > 0 && hoveredCategory === category.id && (
-                                        <div className="dropdown-content">
-                                            <Container>
-                                                <div className="row">
+                                        <div className="dropdown-content w-100 position-absolute start-0">
+                                            <Container fluid>
+                                                <div className="row py-4">
                                                     {category.subCategories.map((subCategory) => (
-                                                        <div className="col-md-3" key={subCategory.id}>
+                                                        <div className="col-md-3 mb-3" key={subCategory.id}>
                                                             <a
                                                                 href={`/category/${subCategory.id}`}
                                                                 className="dropdown-item"

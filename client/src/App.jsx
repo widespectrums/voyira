@@ -27,6 +27,7 @@ import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Login from "./pages/AuthPage.jsx";
 import Orders from "./pages/Orders.jsx";
 import Footer from "./components/Footer.jsx";
@@ -34,11 +35,13 @@ import CartPage from "./pages/CartPage.jsx";
 import ProductPage from "./pages/ProductPage.jsx";
 import OrderPage from "./pages/OrderPage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
+import CustomNavbar from "./components/CustomNavbar.jsx";
 
 const App = () => {
     return (
         <div>
             <ToastContainer/>
+            <CustomNavbar/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
                 <Route path="/about" element={<About/>}/>

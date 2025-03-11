@@ -7,9 +7,11 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
     const [token, setToken] = useState(Cookies.get('token') || null);
-    const [cart, setCart] = useState([]); // Ensure cart is initialized as an empty array
+    const [cart, setCart] = useState([]);
     const navigate = useNavigate();
-    const backendUrl = 'http://localhost:3000';
+
+    // Fix: Use the correct environment variable format for Vite
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
         const cookieToken = Cookies.get('token');
@@ -84,7 +86,7 @@ export const AppProvider = ({ children }) => {
             token,
             setToken,
             cart,
-            setCart, // Provide a way to modify the cart
+            setCart,
             navigate,
             backendUrl,
             logout,
@@ -98,3 +100,6 @@ export const AppProvider = ({ children }) => {
 export const useApp = () => {
     return useContext(AppContext);
 };
+
+// Export the context itself for cases where useContext is needed directly
+export default AppContext;
