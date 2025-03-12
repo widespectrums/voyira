@@ -1,21 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Button, Spinner, InputGroup, Form } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useApp } from "../context/AppContext.jsx";
+import { toast } from 'react-toastify';
 
 const ProductDetail = () => {
     const { slug } = useParams(); // URL'den ürün slug'ını alıyoruz
-    const { backendUrl, cart, setCart, isAuthenticated } = useApp();
+    const { backendUrl, cart, setCart, isAuthenticated, addToCart, setIsCartOpen } = useApp();
 
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedColor, setSelectedColor] = useState(null);
     const [selectedSize, setSelectedSize] = useState(null);
+    const [quantity, setQuantity] = useState(1); // Miktar için state ekledik
     const [apiResponse, setApiResponse] = useState(null); // API yanıtını saklamak için
 
-    // Sayfa yüklendiğinde ürün verilerini getir
+    // Renk adından hex koduna dönüşüm yapan yardımcı fonksiyon
+    const getColorHexCode = (colorName) => {
+        const colorMap = {
+            'Kırmızı': '#FF0000',
+            'Yeşil': '#008000',
+            'Mavi': '#0000FF',
+            'Siyah': '#000000',
+            'Beyaz': '#FFFFFF',
+            'Sarı': '#FFFF00',
+            'Turuncu': '#FFA500',
+            'Mor': '#800080',
+            'Pembe': '#FFC0CB',
+            'Gri': '#808080',
+            'Kahverengi': '#A52A2A'
+            // Daha fazla renk eklenebilir
+        };
+
+        return colorMap[colorName] || '#333333'; // Eğer tanımlı değilse varsayılan gri renk
+    };
+
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
@@ -77,6 +98,31 @@ const ProductDetail = () => {
         }
     }, [slug, backendUrl]);
 
+    // Miktar değişimini yönet
+    const handleQuantityChange = (e) => {
+        const value = parseInt(e.target.value);
+        if (!isNaN(value) && value > 0) {
+            // Stok miktarını aşmamak için kontrol
+            const maxStock = product.stock || 999;
+            setQuantity(Math.min(value, maxStock));
+        }
+    };
+
+    // Miktar artırma
+    const increaseQuantity = () => {
+        if (product && product.stock) {
+            // Stok miktarını aşmamak için kontrol
+            setQuantity(prev => Math.min(prev + 1, product.stock));
+        } else {
+            setQuantity(prev => prev + 1);
+        }
+    };
+
+    // Miktar azaltma
+    const decreaseQuantity = () => {
+        setQuantity(prev => Math.max(prev - 1, 1)); // Minimum 1 miktar
+    };
+
     // Sepete ekleme fonksiyonu
     const handleAddToCart = () => {
         if (!product) return;
@@ -84,32 +130,74 @@ const ProductDetail = () => {
         try {
             // Renk ve beden seçimi varsa kontrol et
             if (product.colors && product.colors.length > 0 && !selectedColor) {
-                alert('Lütfen bir renk seçin.');
+                toast.error('Lütfen bir renk seçin.');
                 return;
             }
 
             if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-                alert('Lütfen bir beden seçin.');
+                toast.error('Lütfen bir beden seçin.');
                 return;
             }
 
-            // Sepete ürün ekle
-            const cartItem = {
+            // Seçilen renk ve beden adlarını bul
+            const colorName = selectedColor
+                ? product.colors.find(c => c.id === selectedColor)?.name || ''
+                : '';
+
+            const sizeName = selectedSize
+                ? product.sizes.find(s => s.id === selectedSize)?.name || ''
+                : '';
+
+            // Ürün fiyatını belirle
+            const price = product.sale_price || product.price;
+
+            // Sepete eklenecek olan ürün
+            const productToAdd = {
                 id: product.id,
-                product,
-                colorId: selectedColor,
-                colorName: selectedColor ? product.colors.find(c => c.id === selectedColor)?.name || '' : '',
-                sizeId: selectedSize,
-                sizeName: selectedSize ? product.sizes.find(s => s.id === selectedSize)?.name || '' : '',
-                quantity: 1,
-                price: product.sale_price || product.price
+                name: product.name,
+                price: parseFloat(price),
+                image: product.images && product.images.length > 0
+                    ? `${backendUrl}${product.images[0].url}`
+                    : '/images/product-placeholder.jpg',
+                size: sizeName,
+                color: colorName,
+                quantity: quantity,
+                productRef: product  // Gerekirse ürünün tamamına referans
             };
 
-            setCart([...cart, cartItem]);
-            alert('Ürün sepete eklendi');
+            // Context'ten gelen addToCart fonksiyonu varsa kullan
+            if (typeof addToCart === 'function') {
+                addToCart(productToAdd);
+            } else {
+                // Yoksa manuel olarak cart'ı güncelle
+                // Önce sepette aynı ürün (aynı id, renk ve beden) var mı diye kontrol
+                const existingItemIndex = cart.findIndex(item =>
+                    item.id === product.id &&
+                    item.color === colorName &&
+                    item.size === sizeName
+                );
+
+                let newCart;
+                if (existingItemIndex !== -1) {
+                    // Ürün zaten sepette, miktarını artır
+                    newCart = [...cart];
+                    newCart[existingItemIndex].quantity += quantity;
+                    toast.info('Ürün miktarı güncellendi');
+                } else {
+                    // Ürün sepette yok, sepete ekle
+                    newCart = [...cart, productToAdd];
+                    toast.success('Ürün sepete eklendi');
+                }
+
+                setCart(newCart);
+                // Sepet panelini aç
+                if (typeof setIsCartOpen === 'function') {
+                    setIsCartOpen(true);
+                }
+            }
         } catch (err) {
             console.error('Sepete eklerken hata oluştu:', err);
-            alert('Ürün sepete eklenirken bir hata oluştu');
+            toast.error('Ürün sepete eklenirken bir hata oluştu');
         }
     };
 
@@ -236,6 +324,8 @@ const ProductDetail = () => {
                             <div><strong>ID:</strong> {product.id}</div>
                             <div><strong>Slug:</strong> {product.slug}</div>
                             <div><strong>Görsel sayısı:</strong> {getImages().length}</div>
+                            <div><strong>Renk sayısı:</strong> {getColors().length}</div>
+                            <div><strong>Beden sayısı:</strong> {getSizes().length}</div>
                         </div>
                     )}
 
@@ -299,7 +389,7 @@ const ProductDetail = () => {
                                     <button
                                         key={color.id}
                                         className={`color-swatch ${selectedColor === color.id ? 'selected' : ''}`}
-                                        style={{ backgroundColor: color.hex_code || "#333" }}
+                                        style={{ backgroundColor: getColorHexCode(color.name) }}
                                         onClick={() => setSelectedColor(color.id)}
                                         aria-label={color.name}
                                     ></button>
@@ -328,6 +418,44 @@ const ProductDetail = () => {
                             </div>
                         </div>
                     )}
+
+                    {/* Miktar Seçimi */}
+                    <div className="quantity-selection mb-4">
+                        <div className="option-label mb-2">
+                            <span>Miktar</span>
+                        </div>
+                        <InputGroup className="quantity-input">
+                            <Button
+                                variant="outline-secondary"
+                                onClick={decreaseQuantity}
+                                disabled={quantity <= 1}
+                                className="quantity-btn"
+                            >
+                                -
+                            </Button>
+                            <Form.Control
+                                type="number"
+                                value={quantity}
+                                onChange={handleQuantityChange}
+                                min="1"
+                                max={product.stock || 999}
+                                className="text-center"
+                            />
+                            <Button
+                                variant="outline-secondary"
+                                onClick={increaseQuantity}
+                                disabled={product.stock && quantity >= product.stock}
+                                className="quantity-btn"
+                            >
+                                +
+                            </Button>
+                        </InputGroup>
+                        {product.stock && product.stock < 10 && (
+                            <div className="mt-2 text-danger small">
+                                <i className="bi bi-exclamation-circle"></i> Sadece {product.stock} adet kaldı
+                            </div>
+                        )}
+                    </div>
 
                     {/* Sepete Ekle Butonu */}
                     <Button

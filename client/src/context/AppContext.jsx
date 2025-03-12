@@ -2,12 +2,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
     const [token, setToken] = useState(Cookies.get('token') || null);
     const [cart, setCart] = useState([]);
+    const [isCartOpen, setIsCartOpen] = useState(false);
     const navigate = useNavigate();
 
     // Fix: Use the correct environment variable format for Vite
@@ -81,16 +83,81 @@ export const AppProvider = ({ children }) => {
         validateToken();
     }, [token]);
 
+    // Sepet İşlemleri
+    const addToCart = (product) => {
+        setCart(prevCart => {
+            // Ürün sepette var mı kontrol et
+            const existingItem = prevCart.find(item =>
+                item.id === product.id &&
+                item.size === product.size &&
+                item.color === product.color
+            );
+
+            let newCart;
+            if (existingItem) {
+                // Ürün zaten sepette, miktarını artır
+                newCart = prevCart.map(item =>
+                    (item.id === product.id && item.size === product.size && item.color === product.color)
+                        ? { ...item, quantity: item.quantity + (product.quantity || 1) }
+                        : item
+                );
+                toast.info('Ürün miktarı güncellendi');
+            } else {
+                // Ürün sepette yok, sepete ekle
+                newCart = [...prevCart, { ...product, quantity: product.quantity || 1 }];
+                toast.success('Ürün sepete eklendi');
+            }
+
+            // Sepeti güncelle ve sepet panelini aç
+            setIsCartOpen(true);
+            return newCart;
+        });
+    };
+
+    const removeFromCart = (itemId, size, color) => {
+        setCart(prevCart => {
+            const newCart = prevCart.filter(item =>
+                !(item.id === itemId && item.size === size && item.color === color)
+            );
+            toast.info('Ürün sepetten çıkarıldı');
+            return newCart;
+        });
+    };
+
+    const updateCartItemQuantity = (itemId, size, color, newQuantity) => {
+        if (newQuantity < 1) return;
+
+        setCart(prevCart => {
+            return prevCart.map(item =>
+                (item.id === itemId && item.size === size && item.color === color)
+                    ? { ...item, quantity: newQuantity }
+                    : item
+            );
+        });
+    };
+
+    const clearCart = () => {
+        setCart([]);
+        toast.info('Sepet temizlendi');
+    };
+
     return (
         <AppContext.Provider value={{
             token,
             setToken,
             cart,
             setCart,
+            isCartOpen,
+            setIsCartOpen,
             navigate,
             backendUrl,
             logout,
-            isAuthenticated: !!token
+            isAuthenticated: !!token,
+            // Sepet işlevleri
+            addToCart,
+            removeFromCart,
+            updateCartItemQuantity,
+            clearCart
         }}>
             {children}
         </AppContext.Provider>
