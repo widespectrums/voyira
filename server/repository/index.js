@@ -11,11 +11,17 @@ import ProductCategoriesRepository from "./product/product-categories.repository
 import ProductSizesRepository from "./product/product-sizes.repository.js";
 import ProductColorsRepository from "./product/product-colors.repository.js";
 import ProductTagsRepository from "./product/product-tags.repository.js";
+import CartRepository from './cart.repository.js';
+import CartItemRepository from './cartItem.repository.js';
+import ShippingMethodRepository from './shippingMethod.repository.js';
 
 const categoryRepository = new CategoryRepository();
 const sizeRepository = new SizeRepository();
 const colorRepository = new ColorRepository();
 const tagRepository = new TagRepository();
+export const cartRepository = new CartRepository();
+export const cartItemRepository = new CartItemRepository();
+export const shippingMethodRepository = new ShippingMethodRepository();
 
 const productCategoriesRepository = new ProductCategoriesRepository(categoryRepository);
 const productSizesRepository = new ProductSizesRepository(sizeRepository);

@@ -11,6 +11,9 @@ import Color from "./color.model.js";
 import Size from "./size.model.js";
 import ProductSizes from "./junctions/product-sizes.model.js";
 import ProductColors from "./junctions/product-colors.model.js";
+import Cart from "./cart.model.js";
+import CartItem from "./cartItem.model.js";
+import ShippingMethod from "./shippingMethod.model.js";
 
 const models = {
     User,
@@ -26,6 +29,9 @@ const models = {
     Size,
     ProductSizes,
     ProductColors,
+    Cart,
+    CartItem,
+    ShippingMethod,
 };
 
 Object.keys(models).forEach(modelName => {

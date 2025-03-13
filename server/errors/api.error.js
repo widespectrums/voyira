@@ -41,3 +41,9 @@ export class TooManyRequestsError extends ApiError {
         super(message, 429);
     };
 }
+
+export class BadRequestError extends ApiError {
+    constructor(message = "Bad Request", details) {
+        super(message, 400, details);
+    };
+}

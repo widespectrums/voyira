@@ -17,6 +17,8 @@ import colorRoutes from "./routes/color/color.routes.js";
 import sizeRoutes from "./routes/size/size.routes.js";
 import imageRoutes from "./routes/image/image.routes.js";
 import cors from 'cors';
+import cartRoutes from "./routes/cart.routes.js";
+import shippingRoutes from "./routes/shipping.routes.js";
 
 
 
@@ -66,6 +68,8 @@ app.use('/tags', tagRoutes)
 app.use('/colors', colorRoutes)
 app.use('/sizes', sizeRoutes)
 app.use('/images', imageRoutes)
+app.use('/cart', cartRoutes)
+app.use('/shipping', shippingRoutes)
 
 app.get("/", (req, res) => {
     res.send("API Working successfully...");

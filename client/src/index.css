@@ -160,6 +160,7 @@ a.active hr {
     color: white;
 }
 
+
 .search-input:focus {
     box-shadow: none;
     background-color: transparent;

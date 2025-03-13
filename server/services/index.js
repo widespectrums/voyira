@@ -1,3 +1,4 @@
+// services/index.js - Düzeltilmiş versiyon
 import UserRepository from '../repository/user/user.repository.js';
 import AddressRepository from '../repository/address/address.repository.js';
 import ImageRepository from '../repository/image/image.repository.js';
@@ -17,9 +18,12 @@ import {productCategoriesRepository} from "../repository/index.js";
 import {productColorsRepository} from "../repository/index.js";
 import {productTagsRepository} from "../repository/index.js";
 
+import CartService from "./cart.service.js";
+import ShippingMethodService from "./shippingMethod.service.js";
+
 import {
     BrandRepository, CategoryRepository, ProductRepository,
-    TagRepository, ColorRepository, SizeRepository
+    TagRepository, ColorRepository, SizeRepository, cartItemRepository, cartRepository, shippingMethodRepository
 } from "../repository/index.js";
 
 
@@ -36,7 +40,6 @@ const tagRepository = new TagRepository();
 const colorRepository = new ColorRepository();
 const sizeRepository = new SizeRepository();
 
-
 export const userService = new UserService(userRepository, addressRepository);
 export const authService = new AuthService(userRepository, emailService);
 export const addressService = new AddressService(addressRepository, userRepository);
@@ -47,10 +50,29 @@ export const tagService = new TagService(tagRepository);
 export const colorService = new ColorService(colorRepository);
 export const sizeService = new SizeService(sizeRepository);
 export const imageService = new ImageService(imageRepository);
-
 export const productService = new ProductService(
     productRepository, brandRepository, productCategoriesRepository,
     productTagsRepository, productColorsRepository, productSizesRepository,
     categoryRepository, tagRepository, colorRepository,
     sizeRepository, imageRepository
 );
+// Bu satırı düzeltiyoruz - productCategoriesRepository yerine productService olmalı
+export const cartService = new CartService(cartRepository, cartItemRepository, productService);
+export const shippingMethodService = new ShippingMethodService(shippingMethodRepository);
+
+
+
+export default {
+    userService,
+    authService,
+    addressService,
+    productService,
+    categoryService,
+    brandService,
+    tagService,
+    colorService,
+    sizeService,
+    imageService,
+    cartService,
+    shippingMethodService,
+}
