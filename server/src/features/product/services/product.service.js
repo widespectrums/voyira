@@ -28,14 +28,20 @@ export default class ProductService extends BaseService {
         super(productRepository);
 
         this.brandRepository = new BrandRepository();
-        this.productCategoriesRepository = new ProductCategoriesRepository();
-        this.productTagsRepository = new ProductTagsRepository();
-        this.productColorsRepository = new ProductColorsRepository();
-        this.productSizesRepository = new ProductSizesRepository();
+
         this.categoryRepository = new CategoryRepository();
+        this.productCategoriesRepository = new ProductCategoriesRepository(this.categoryRepository);
+
         this.tagRepository = new TagRepository();
+        this.productTagsRepository = new ProductTagsRepository(this.tagRepository);
+
         this.colorRepository = new ColorRepository();
+        this.productColorsRepository = new ProductColorsRepository(this.colorRepository);
+
         this.sizeRepository = new SizeRepository();
+        this.productSizesRepository = new ProductSizesRepository(this.sizeRepository);
+
+
         this.imageRepository = new ImageRepository();
     };
 
@@ -397,5 +403,48 @@ export default class ProductService extends BaseService {
             uniqueSlug = `${baseSlug}-${counter++}`;
         }
         return uniqueSlug;
+    };
+
+    getProductsByCategoryId = async (categoryId, queryParams = {}) => {
+        try {
+            const {
+                page,
+                limit,
+                sort_by,
+                sort_order,
+                name,
+                min_price,
+                max_price,
+                brand_id,
+                color_id,
+                size_id,
+                active,
+                include_subcategories = true
+            } = queryParams;
+
+            // Filtreleme seçenekleri
+            const filters = {
+                name,
+                minPrice: min_price,
+                maxPrice: max_price,
+                brand_id,
+                active: active === 'true' ? true : active === 'false' ? false : undefined
+            };
+
+            // Kategori repoya gönderilecek parametreler
+            const result = await this.repository.findProductsByCategoryId(categoryId, {
+                page: parseInt(page) || 1,
+                limit: parseInt(limit) || 10,
+                sort: sort_by || 'createdAt',
+                order: sort_order || 'DESC',
+                filters,
+                includeSubCategories: include_subcategories === 'true' || include_subcategories === true
+            });
+
+            return result;
+        } catch (error) {
+            console.error("Error in getProductsByCategoryId:", error);
+            throw error;
+        }
     };
 };

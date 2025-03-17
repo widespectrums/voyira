@@ -69,4 +69,19 @@ export default class ProductController extends BaseController {
             this.handleError(next, error);
         }
     };
+
+    getProductsByCategoryId = async (req, res, next) => {
+        try {
+            const categoryId = req.params.categoryId;
+            const queryParams = req.query;
+            const result = await this.service.getProductsByCategoryId(categoryId, queryParams);
+
+            return this.handleResponse(res, {
+                data: result.products,
+                pagination: result.pagination,
+            });
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
 };

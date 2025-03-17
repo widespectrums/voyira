@@ -1,8 +1,10 @@
 import BaseController from "../../../core/base/base.controller.js";
 import { NotFoundError, BadRequestError } from "../../../core/errors/api.error.js";
+import CartService from "../services/cart.service.js";
 
 export default class CartController extends BaseController {
-    constructor(cartService) {
+    constructor() {
+        const cartService = new CartService();
         super(cartService);
     }
 

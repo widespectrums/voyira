@@ -30,4 +30,9 @@ router.delete("/:productId",
     productController.deleteProduct
 );
 
+router.get(
+    '/by-category/:categoryId', productController.getProductsByCategoryId
+);
+
+
 export default router;

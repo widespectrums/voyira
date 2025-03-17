@@ -2,14 +2,16 @@ import BaseService from "../../../core/base/base.service.js";
 import  sequelize  from "../../../config/database.js";
 import { NotFoundError, BadRequestError, ConflictError } from "../../../core/errors/api.error.js";
 import CartRepository from "../repositories/cart.repository.js";
+import CartItemRepository from "../repositories/cartItem.repository.js";
+import ProductService from "../../product/services/product.service.js";
 
 export default class CartService extends BaseService {
-    constructor(cartItemRepository, productService) {
+    constructor() {
         const cartRepository = new CartRepository();
         super(cartRepository);
 
-        this.cartItemRepository = cartItemRepository;
-        this.productService = productService;
+        this.cartItemRepository = new CartItemRepository();
+        this.productService = new ProductService();
     }
 
     getUserCart = async (userId) => {
