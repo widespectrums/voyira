@@ -1,5 +1,7 @@
 import {Model} from "sequelize";
 import sequelize from "../../config/database.js";
+import { Op } from "sequelize";
+
 
 export default class BaseRepository {
     constructor(model) {
@@ -57,4 +59,20 @@ export default class BaseRepository {
     startTransaction() {
         return sequelize.transaction();
     };
+
+    bulkDelete = async (identifiers, options = {}) => {
+        if (!Array.isArray(identifiers) || identifiers.length === 0) {
+            return 0;
+        }
+
+        return this.model.destroy({
+            where: {
+                id: {
+                    [Op.in]: identifiers
+                }
+            },
+            ...options
+        });
+    };
 };
+

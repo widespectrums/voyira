@@ -15,4 +15,10 @@ router.get("/subcategories/:parentId",
     categoryController.getSubCategories
     );
 
+router.patch("/:id",
+    categoryController.updateCategory);
+
+router.delete("/:id",
+    categoryController.deleteCategory);
+
 export default router;

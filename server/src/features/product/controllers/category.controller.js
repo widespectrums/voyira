@@ -39,4 +39,31 @@ export default class CategoryController extends BaseController {
             this.handleError(next, error);
         }
     };
+
+    updateCategory = async (req, res, next) => {
+        try {
+            const categoryId = req.params.id;
+            const updatedCategory = await this.service.updateCategory(categoryId, req.body);
+            this.handleResponse(res, { category: updatedCategory }, 200);
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
+
+    deleteCategory = async (req, res, next) => {
+        try {
+            const categoryId = req.params.id;
+            const result = await this.service.deleteWithSubCategories(categoryId);
+
+            this.handleResponse(res, {
+                message: `Category deleted with ${result.deletedSubCategories} subcategories`,
+                deletedItems: {
+                    mainCategory: result.mainCategory,
+                    deletedSubCategoriesCount: result.deletedSubCategories
+                }
+            }, 200);
+        } catch (error) {
+            this.handleError(next, error);
+        }
+    };
 };
